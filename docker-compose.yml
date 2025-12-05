@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: integrityos-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-integrityos}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-integrityos123}
+      POSTGRES_DB: ${POSTGRES_DB:-integrityos}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U integrityos"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - integrityos-network
+
+  # FastAPI Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: integrityos-backend
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-integrityos}:${POSTGRES_PASSWORD:-integrityos123}@db:5432/${POSTGRES_DB:-integrityos}
+      API_HOST: 0.0.0.0
+      API_PORT: 8000
+      CORS_ORIGINS: http://localhost:3000,http://localhost:5173
+    volumes:
+      - ./backend:/app
+      - ./data:/app/data
+      - ./models:/app/models
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    networks:
+      - integrityos-network
+
+  # React Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: development
+    container_name: integrityos-frontend
+    environment:
+      VITE_API_URL: http://localhost:8000
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    command: npm run dev -- --host
+    networks:
+      - integrityos-network
+
+volumes:
+  postgres-data:
+
+networks:
+  integrityos-network:
+    driver: bridge
