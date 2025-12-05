@@ -13,12 +13,12 @@ load_dotenv()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
-    print("🚀 Initializing IntegrityOS Backend...")
+    print("Initializing IntegrityOS Backend...")
     init_db()
-    print("✅ Database initialized")
+    print("Database initialized")
     yield
     # Shutdown
-    print("👋 Shutting down IntegrityOS Backend...")
+    print("Shutting down IntegrityOS Backend...")
 
 
 app = FastAPI(
