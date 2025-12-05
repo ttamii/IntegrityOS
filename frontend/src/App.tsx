@@ -1,10 +1,11 @@
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Map, List, Upload, FileText, Database } from 'lucide-react';
+import { LayoutDashboard, Map, List, Upload, FileText, Database, Info } from 'lucide-react';
 import Dashboard from './pages/Dashboard';
 import MapView from './pages/MapView';
 import ObjectsList from './pages/ObjectsList';
 import ImportData from './pages/ImportData';
 import Reports from './pages/Reports';
+import About from './pages/About';
 
 function Navigation() {
     const location = useLocation();
@@ -15,6 +16,7 @@ function Navigation() {
         { path: '/objects', icon: List, label: 'Объекты' },
         { path: '/import', icon: Upload, label: 'Импорт' },
         { path: '/reports', icon: FileText, label: 'Отчеты' },
+        { path: '/about', icon: Info, label: 'О проекте' },
     ];
 
     return (
@@ -34,8 +36,8 @@ function Navigation() {
                                     key={item.path}
                                     to={item.path}
                                     className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive
-                                            ? 'bg-primary-600 text-white'
-                                            : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+                                        ? 'bg-primary-600 text-white'
+                                        : 'text-slate-300 hover:bg-slate-700 hover:text-white'
                                         }`}
                                 >
                                     <Icon className="h-5 w-5 mr-2" />
@@ -62,6 +64,7 @@ function App() {
                         <Route path="/objects" element={<ObjectsList />} />
                         <Route path="/import" element={<ImportData />} />
                         <Route path="/reports" element={<Reports />} />
+                        <Route path="/about" element={<About />} />
                     </Routes>
                 </main>
             </div>

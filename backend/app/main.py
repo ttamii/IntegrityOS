@@ -5,7 +5,7 @@ import os
 from dotenv import load_dotenv
 
 from app.database import init_db
-from app.routes import objects, inspections, dashboard, import_data, reports
+from app.routes import objects, inspections, dashboard, import_data, reports, admin
 
 load_dotenv()
 
@@ -45,6 +45,7 @@ app.include_router(inspections.router, prefix="/api/inspections", tags=["Inspect
 app.include_router(dashboard.router, prefix="/api/dashboard", tags=["Dashboard"])
 app.include_router(import_data.router, prefix="/api/import", tags=["Import"])
 app.include_router(reports.router, prefix="/api/reports", tags=["Reports"])
+app.include_router(admin.router, prefix="/api/admin", tags=["Admin"])
 
 
 @app.get("/")

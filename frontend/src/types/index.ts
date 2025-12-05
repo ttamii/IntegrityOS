@@ -61,15 +61,14 @@ export interface DashboardStats {
     defects_by_method: Record<string, number>;
     defects_by_risk: Record<string, number>;
     inspections_by_year: Record<string, number>;
-    top_risks: TopRisk[];
-}
-
-export interface TopRisk {
-    object_name: string;
-    object_id: number;
-    description: string;
-    risk_level: RiskLevel;
-    confidence: number;
+    defects_by_year: Record<string, number>;
+    top_risks: Array<{
+        object_name: string;
+        object_id: number;
+        description: string;
+        risk_level: RiskLevel;
+        confidence: number;
+    }>;
 }
 
 export interface ImportResult {

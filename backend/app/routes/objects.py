@@ -45,7 +45,7 @@ def create_object(obj: schemas.ObjectCreate, db: Session = Depends(get_db)):
     return crud.create_object(db, obj)
 
 
-@router.get("/map/markers", response_model=List[schemas.ObjectResponse])
+@router.get("/map/markers", response_model=List[schemas.ObjectWithInspections])
 def get_map_markers(
     method: Optional[str] = None,
     date_from: Optional[str] = None,

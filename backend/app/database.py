@@ -8,7 +8,7 @@ load_dotenv()
 
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "postgresql://integrityos:integrityos123@localhost:5432/integrityos"
+    "sqlite:///./integrityos.db"  # Use SQLite for easy testing
 )
 
 engine = create_engine(DATABASE_URL, pool_pre_ping=True, pool_size=10, max_overflow=20)

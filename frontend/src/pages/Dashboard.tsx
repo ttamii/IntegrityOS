@@ -51,16 +51,30 @@ export default function Dashboard() {
         count,
     }));
 
-    const riskData = Object.entries(stats.defects_by_risk).map(([risk, count]) => ({
-        name: risk === 'normal' ? 'Низкий' : risk === 'medium' ? 'Средний' : 'Высокий',
-        value: count,
-        color: RISK_COLORS[risk as keyof typeof RISK_COLORS],
-    }));
+    const riskData = Object.entries(stats.defects_by_risk).map(([risk, count]) => {
+        let name = 'Неизвестно';
+        if (risk === 'normal') name = 'Низкий';
+        else if (risk === 'medium') name = 'Средний';
+        else if (risk === 'high') name = 'Высокий';
+
+        return {
+            name,
+            value: count,
+            color: RISK_COLORS[risk as keyof typeof RISK_COLORS] || '#9ca3af',
+        };
+    });
 
     const yearsData = Object.entries(stats.inspections_by_year).map(([year, count]) => ({
         year,
         count,
     })).sort((a, b) => parseInt(a.year) - parseInt(b.year));
+
+    const defectsYearsData = stats.defects_by_year
+        ? Object.entries(stats.defects_by_year).map(([year, count]) => ({
+            year,
+            count,
+        })).sort((a, b) => parseInt(a.year) - parseInt(b.year))
+        : [];
 
     return (
         <div className="space-y-6 animate-fade-in">
@@ -144,7 +158,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* Inspections Timeline */}
-                <div className="bg-slate-800 rounded-lg p-6 card-hover lg:col-span-2">
+                <div className="bg-slate-800 rounded-lg p-6 card-hover">
                     <h2 className="text-xl font-semibold text-white mb-4">Динамика обследований по годам</h2>
                     <ResponsiveContainer width="100%" height={300}>
                         <LineChart data={yearsData}>
@@ -157,6 +171,24 @@ export default function Dashboard() {
                             />
                             <Legend />
                             <Line type="monotone" dataKey="count" stroke="#3b82f6" strokeWidth={2} name="Обследований" />
+                        </LineChart>
+                    </ResponsiveContainer>
+                </div>
+
+                {/* Defects Timeline */}
+                <div className="bg-slate-800 rounded-lg p-6 card-hover">
+                    <h2 className="text-xl font-semibold text-white mb-4">Динамика дефектов по годам</h2>
+                    <ResponsiveContainer width="100%" height={300}>
+                        <LineChart data={defectsYearsData}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                            <XAxis dataKey="year" stroke="#94a3b8" />
+                            <YAxis stroke="#94a3b8" />
+                            <Tooltip
+                                contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155' }}
+                                labelStyle={{ color: '#e2e8f0' }}
+                            />
+                            <Legend />
+                            <Line type="monotone" dataKey="count" stroke="#f87171" strokeWidth={2} name="Дефектов" />
                         </LineChart>
                     </ResponsiveContainer>
                 </div>

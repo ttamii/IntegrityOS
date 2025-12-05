@@ -144,19 +144,28 @@ def get_dashboard_stats(db: Session):
         models.Inspection.ml_confidence.desc()
     ).limit(5).all()
     
+    # Defects by year
+    defects_by_year = db.query(
+        func.extract('year', models.Inspection.date).label('year'),
+        func.count(models.Inspection.id).label('count')
+    ).filter(
+        models.Inspection.defect_found == True
+    ).group_by('year').order_by('year').all()
+    
     return {
         "total_objects": total_objects,
         "total_inspections": total_inspections,
         "total_defects": total_defects,
-        "defects_by_method": {str(method): count for method, count in defects_by_method},
-        "defects_by_risk": {str(risk): count for risk, count in defects_by_risk},
+        "defects_by_method": {method.value if hasattr(method, 'value') else str(method): count for method, count in defects_by_method},
+        "defects_by_risk": {risk.value if hasattr(risk, 'value') else str(risk): count for risk, count in defects_by_risk},
         "inspections_by_year": {int(year): count for year, count in inspections_by_year},
+        "defects_by_year": {int(year): count for year, count in defects_by_year},
         "top_risks": [
             {
                 "object_name": name,
                 "object_id": obj_id,
                 "description": desc,
-                "risk_level": risk,
+                "risk_level": risk.value if hasattr(risk, 'value') else str(risk),
                 "confidence": conf
             }
             for name, obj_id, desc, risk, conf in top_risks
