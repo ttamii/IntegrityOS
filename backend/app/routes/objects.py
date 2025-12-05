@@ -116,6 +116,16 @@ def export_to_excel(
         cell.font = header_font
         cell.alignment = header_alignment
     
+    # Helper function to get clean enum value
+    def get_value(obj, attr):
+        val = getattr(obj, attr, None)
+        if val is None:
+            return ""
+        # If it's an enum, get its value
+        if hasattr(val, 'value'):
+            return val.value
+        return str(val)
+    
     # Data rows
     row_num = 2
     for obj in objects:
@@ -126,17 +136,17 @@ def export_to_excel(
             for insp in obj_full.inspections:
                 ws.cell(row=row_num, column=1, value=obj.object_id)
                 ws.cell(row=row_num, column=2, value=obj.object_name)
-                ws.cell(row=row_num, column=3, value=obj.object_type)
+                ws.cell(row=row_num, column=3, value=get_value(obj, 'object_type'))
                 ws.cell(row=row_num, column=4, value=obj.pipeline_id)
                 ws.cell(row=row_num, column=5, value=obj.lat)
                 ws.cell(row=row_num, column=6, value=obj.lon)
                 ws.cell(row=row_num, column=7, value=obj.year)
                 ws.cell(row=row_num, column=8, value=obj.material)
                 ws.cell(row=row_num, column=9, value=insp.date.strftime("%Y-%m-%d") if insp.date else "")
-                ws.cell(row=row_num, column=10, value=insp.method)
+                ws.cell(row=row_num, column=10, value=get_value(insp, 'method'))
                 ws.cell(row=row_num, column=11, value="Yes" if insp.defect_found else "No")
-                ws.cell(row=row_num, column=12, value=insp.quality_grade or "")
-                ws.cell(row=row_num, column=13, value=insp.ml_label or "")
+                ws.cell(row=row_num, column=12, value=get_value(insp, 'quality_grade'))
+                ws.cell(row=row_num, column=13, value=get_value(insp, 'ml_label'))
                 ws.cell(row=row_num, column=14, value=insp.param1)
                 ws.cell(row=row_num, column=15, value=insp.param2)
                 ws.cell(row=row_num, column=16, value=insp.param3)
