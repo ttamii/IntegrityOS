@@ -221,14 +221,6 @@ diag_id,object_id,method,date,temperature,humidity,illumination,defect_found,def
 - **GEO** — Геодезический контроль
 - **UTWM** — Ультразвуковая толщинометрия
 
-## Вклад в проект
-
-1. Fork репозитория
-2. Создайте feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit изменения (`git commit -m 'Add AmazingFeature'`)
-4. Push в branch (`git push origin feature/AmazingFeature`)
-5. Откройте Pull Request
-
 ## Лицензия
 
 MIT License
