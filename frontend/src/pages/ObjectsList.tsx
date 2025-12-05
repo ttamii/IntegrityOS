@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Search, Filter, X } from 'lucide-react';
+import { Search, Filter, X, Download } from 'lucide-react';
 import { objectsAPI, inspectionsAPI } from '../services/api';
 import type { PipelineObject, Inspection } from '../types';
 
@@ -10,6 +10,7 @@ export default function ObjectsList() {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterType, setFilterType] = useState('');
+    const [exporting, setExporting] = useState(false);
 
     useEffect(() => {
         loadObjects();
@@ -42,6 +43,30 @@ export default function ObjectsList() {
         }
     };
 
+    const handleExportExcel = async () => {
+        try {
+            setExporting(true);
+            const params = new URLSearchParams();
+            if (filterType) params.append('object_type', filterType);
+
+            const response = await fetch(`http://localhost:8000/api/objects/export/excel?${params}`);
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `integrityos_export_${new Date().toISOString().slice(0, 10)}.xlsx`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        } catch (error) {
+            console.error('Failed to export:', error);
+            alert('Ошибка при экспорте данных');
+        } finally {
+            setExporting(false);
+        }
+    };
+
     const filteredObjects = objects.filter(obj =>
         obj.object_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         obj.object_id.toString().includes(searchTerm)
@@ -50,9 +75,19 @@ export default function ObjectsList() {
     return (
         <div className="space-y-6 animate-fade-in">
             {/* Header */}
-            <div>
-                <h1 className="text-3xl font-bold text-white mb-2">Список объектов</h1>
-                <p className="text-slate-400">Просмотр и поиск объектов контроля</p>
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-3xl font-bold text-white mb-2">Список объектов</h1>
+                    <p className="text-slate-400">Просмотр и поиск объектов контроля</p>
+                </div>
+                <button
+                    onClick={handleExportExcel}
+                    disabled={exporting || objects.length === 0}
+                    className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    <Download className="h-5 w-5 mr-2" />
+                    {exporting ? 'Экспорт...' : 'Экспорт в Excel'}
+                </button>
             </div>
 
             {/* Search and Filters */}
@@ -104,8 +139,8 @@ export default function ObjectsList() {
                                     key={obj.object_id}
                                     onClick={() => loadObjectDetails(obj.object_id)}
                                     className={`bg-slate-800 rounded-lg p-4 cursor-pointer transition-all ${selectedObject?.object_id === obj.object_id
-                                            ? 'ring-2 ring-primary-500 bg-slate-700'
-                                            : 'hover:bg-slate-700'
+                                        ? 'ring-2 ring-primary-500 bg-slate-700'
+                                        : 'hover:bg-slate-700'
                                         }`}
                                 >
                                     <div className="flex items-start justify-between">
@@ -198,10 +233,10 @@ export default function ObjectsList() {
                                                     {insp.ml_label && (
                                                         <span
                                                             className={`px-2 py-1 rounded text-xs font-medium text-white ${insp.ml_label === 'high'
-                                                                    ? 'bg-red-500'
-                                                                    : insp.ml_label === 'medium'
-                                                                        ? 'bg-yellow-500'
-                                                                        : 'bg-green-500'
+                                                                ? 'bg-red-500'
+                                                                : insp.ml_label === 'medium'
+                                                                    ? 'bg-yellow-500'
+                                                                    : 'bg-green-500'
                                                                 }`}
                                                         >
                                                             {insp.ml_label.toUpperCase()}
