@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import {
-    AlertTriangle, Camera, Wrench, CheckCircle, Clock,
-    Plus, X, Upload, Calendar, User, ChevronDown, ChevronUp,
-    Image as ImageIcon
+    AlertTriangle, Camera, Wrench, CheckCircle,
+    Plus, X, Upload, Calendar, XCircle
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -62,6 +61,7 @@ export default function DefectManagement() {
     });
 
     const canEdit = hasRole(['admin', 'inspector']);
+    const isAdmin = hasRole(['admin']);
 
     useEffect(() => {
         fetchDefects();
@@ -158,6 +158,44 @@ export default function DefectManagement() {
         }
     };
 
+    const handleSubmitForApproval = async (workId: number) => {
+        if (!token || !selectedDefect) return;
+
+        try {
+            const response = await fetch(`${API_URL}/api/works/${workId}/complete`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                fetchWorks(selectedDefect.id);
+            }
+        } catch (error) {
+            console.error('Error submitting for approval:', error);
+        }
+    };
+
+    const handleApprove = async (workId: number, approved: boolean) => {
+        if (!token || !selectedDefect) return;
+
+        try {
+            const response = await fetch(`${API_URL}/api/works/${workId}/approve?approved=${approved}`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                fetchWorks(selectedDefect.id);
+            }
+        } catch (error) {
+            console.error('Error approving work:', error);
+        }
+    };
+
     const handleUploadPhoto = async (e: React.ChangeEvent<HTMLInputElement>, isBefore: boolean) => {
         if (!e.target.files?.[0] || !selectedDefect || !token) return;
 
@@ -204,6 +242,7 @@ export default function DefectManagement() {
         const colors: Record<string, string> = {
             planned: 'bg-blue-100 text-blue-700',
             in_progress: 'bg-yellow-100 text-yellow-700',
+            pending_approval: 'bg-purple-100 text-purple-700',
             completed: 'bg-green-100 text-green-700',
             cancelled: 'bg-gray-100 text-gray-700'
         };
@@ -214,6 +253,7 @@ export default function DefectManagement() {
         const labels: Record<string, string> = {
             planned: 'Запланировано',
             in_progress: 'В работе',
+            pending_approval: 'На проверке',
             completed: 'Выполнено',
             cancelled: 'Отменено'
         };
@@ -515,11 +555,42 @@ export default function DefectManagement() {
                                                         )}
                                                     </div>
                                                 </div>
-                                                <div className="flex items-center space-x-2">
+                                                <div className="flex flex-col items-end space-y-2">
                                                     <span className={`text-xs px-2 py-1 rounded ${getStatusColor(work.status)}`}>
                                                         {getStatusLabel(work.status)}
                                                     </span>
-                                                    {canEdit && work.status !== 'completed' && (
+
+                                                    {/* Workflow buttons */}
+                                                    {canEdit && work.status === 'in_progress' && (
+                                                        <button
+                                                            onClick={() => handleSubmitForApproval(work.id)}
+                                                            className="flex items-center text-xs px-2 py-1 bg-purple-600 text-white rounded hover:bg-purple-700"
+                                                        >
+                                                            <CheckCircle className="w-3 h-3 mr-1" />
+                                                            Завершить
+                                                        </button>
+                                                    )}
+
+                                                    {isAdmin && work.status === 'pending_approval' && (
+                                                        <div className="flex space-x-1">
+                                                            <button
+                                                                onClick={() => handleApprove(work.id, true)}
+                                                                className="flex items-center text-xs px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+                                                            >
+                                                                <CheckCircle className="w-3 h-3 mr-1" />
+                                                                Принять
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleApprove(work.id, false)}
+                                                                className="flex items-center text-xs px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+                                                            >
+                                                                <XCircle className="w-3 h-3 mr-1" />
+                                                                Вернуть
+                                                            </button>
+                                                        </div>
+                                                    )}
+
+                                                    {canEdit && (work.status === 'planned' || work.status === 'cancelled') && (
                                                         <select
                                                             value={work.status}
                                                             onChange={(e) => handleUpdateWorkStatus(work.id, e.target.value)}
@@ -527,7 +598,6 @@ export default function DefectManagement() {
                                                         >
                                                             <option value="planned">Запланировано</option>
                                                             <option value="in_progress">В работе</option>
-                                                            <option value="completed">Выполнено</option>
                                                             <option value="cancelled">Отменено</option>
                                                         </select>
                                                     )}

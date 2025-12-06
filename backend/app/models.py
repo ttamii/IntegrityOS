@@ -145,7 +145,8 @@ class Media(Base):
 class WorkStatus(str, enum.Enum):
     PLANNED = "planned"
     IN_PROGRESS = "in_progress"
-    COMPLETED = "completed"
+    PENDING_APPROVAL = "pending_approval"  # Inspector completed, awaiting admin verification
+    COMPLETED = "completed"  # Admin verified
     CANCELLED = "cancelled"
 
 

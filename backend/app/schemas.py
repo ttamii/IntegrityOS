@@ -223,6 +223,7 @@ class MediaResponse(MediaBase):
 class WorkStatus(str, Enum):
     PLANNED = "planned"
     IN_PROGRESS = "in_progress"
+    PENDING_APPROVAL = "pending_approval"
     COMPLETED = "completed"
     CANCELLED = "cancelled"
 

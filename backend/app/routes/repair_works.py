@@ -140,23 +140,66 @@ async def delete_repair_work(
 
 
 @router.post("/{work_id}/complete", response_model=schemas.RepairWorkResponse)
-async def complete_repair_work(
+async def submit_for_approval(
     work_id: int,
     notes: Optional[str] = None,
     current_user: models.User = Depends(require_role(["admin", "inspector"])),
     db: Session = Depends(get_db)
 ):
-    """Mark a repair work as completed (admin/inspector only)"""
+    """
+    Submit work for approval (inspector marks as done).
+    Inspector: sets status to pending_approval.
+    Admin: can directly complete.
+    """
     work = db.query(models.RepairWork).filter(models.RepairWork.id == work_id).first()
     if not work:
         raise HTTPException(status_code=404, detail="Repair work not found")
     
-    work.status = models.WorkStatus.COMPLETED
-    work.completed_date = date.today()
-    if notes:
-        work.notes = (work.notes or "") + f"\n\nЗавершено: {notes}"
+    # Admin can directly complete, Inspector submits for approval
+    if current_user.role == models.UserRole.ADMIN:
+        work.status = models.WorkStatus.COMPLETED
+        work.completed_date = date.today()
+        if notes:
+            work.notes = (work.notes or "") + f"\n\nЗавершено (Admin): {notes}"
+    else:
+        work.status = models.WorkStatus.PENDING_APPROVAL
+        if notes:
+            work.notes = (work.notes or "") + f"\n\nОтправлено на проверку: {notes}"
     
     db.commit()
     db.refresh(work)
     
     return work
+
+
+@router.post("/{work_id}/approve", response_model=schemas.RepairWorkResponse)
+async def approve_work(
+    work_id: int,
+    approved: bool = True,
+    notes: Optional[str] = None,
+    current_user: models.User = Depends(require_role(["admin"])),
+    db: Session = Depends(get_db)
+):
+    """Approve or reject a work (admin only)"""
+    work = db.query(models.RepairWork).filter(models.RepairWork.id == work_id).first()
+    if not work:
+        raise HTTPException(status_code=404, detail="Repair work not found")
+    
+    if work.status != models.WorkStatus.PENDING_APPROVAL:
+        raise HTTPException(status_code=400, detail="Work is not pending approval")
+    
+    if approved:
+        work.status = models.WorkStatus.COMPLETED
+        work.completed_date = date.today()
+        if notes:
+            work.notes = (work.notes or "") + f"\n\nПодтверждено администратором: {notes}"
+    else:
+        work.status = models.WorkStatus.IN_PROGRESS
+        if notes:
+            work.notes = (work.notes or "") + f"\n\nОтклонено, требуется доработка: {notes}"
+    
+    db.commit()
+    db.refresh(work)
+    
+    return work
+

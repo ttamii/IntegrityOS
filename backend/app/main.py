@@ -12,28 +12,69 @@ from app.auth import get_password_hash
 load_dotenv()
 
 
-def create_default_admin():
-    """Create default admin user if not exists."""
+def create_default_users():
+    """Create default users for all roles if not exist."""
     db = SessionLocal()
     try:
-        admin_user = db.query(models.User).filter(
-            models.User.username == "admin"
-        ).first()
+        default_users = [
+            {
+                "username": "admin",
+                "email": "admin@integrityos.kz",
+                "password": "admin123",
+                "full_name": "Администратор",
+                "role": models.UserRole.ADMIN
+            },
+            {
+                "username": "inspector",
+                "email": "inspector@integrityos.kz",
+                "password": "inspector123",
+                "full_name": "Иванов Петр Сергеевич",
+                "role": models.UserRole.INSPECTOR
+            },
+            {
+                "username": "analyst",
+                "email": "analyst@integrityos.kz",
+                "password": "analyst123",
+                "full_name": "Сидорова Анна Михайловна",
+                "role": models.UserRole.ANALYST
+            },
+            {
+                "username": "guest",
+                "email": "guest@integrityos.kz",
+                "password": "guest123",
+                "full_name": "Гость",
+                "role": models.UserRole.GUEST
+            }
+        ]
         
-        if not admin_user:
-            admin_user = models.User(
-                username="admin",
-                email="admin@integrityos.kz",
-                password_hash=get_password_hash("admin123"),
-                full_name="Администратор",
-                role=models.UserRole.ADMIN,
-                is_active=True
-            )
-            db.add(admin_user)
+        created_count = 0
+        for user_data in default_users:
+            existing = db.query(models.User).filter(
+                models.User.username == user_data["username"]
+            ).first()
+            
+            if not existing:
+                new_user = models.User(
+                    username=user_data["username"],
+                    email=user_data["email"],
+                    password_hash=get_password_hash(user_data["password"]),
+                    full_name=user_data["full_name"],
+                    role=user_data["role"],
+                    is_active=True
+                )
+                db.add(new_user)
+                created_count += 1
+        
+        if created_count > 0:
             db.commit()
-            print("Default admin user created (username: admin, password: admin123)")
+            print(f"Created {created_count} default users")
+            print("Test accounts:")
+            print("  admin / admin123 - Администратор")
+            print("  inspector / inspector123 - Инспектор")
+            print("  analyst / analyst123 - Аналитик")
+            print("  guest / guest123 - Гость")
     except Exception as e:
-        print(f"Error creating default admin: {e}")
+        print(f"Error creating default users: {e}")
     finally:
         db.close()
 
@@ -44,7 +85,7 @@ async def lifespan(app: FastAPI):
     print("Initializing IntegrityOS Backend...")
     init_db()
     print("Database initialized")
-    create_default_admin()
+    create_default_users()
     yield
     # Shutdown
     print("Shutting down IntegrityOS Backend...")
