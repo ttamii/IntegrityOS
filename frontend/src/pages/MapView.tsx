@@ -57,7 +57,16 @@ export default function MapView() {
     const [objects, setObjects] = useState<PipelineObject[]>([]);
     const [loading, setLoading] = useState(true);
     const [showFilters, setShowFilters] = useState(false);
+    const [showAdvanced, setShowAdvanced] = useState(false);
     const [filters, setFilters] = useState<InspectionFilter>({});
+    const [paramRanges, setParamRanges] = useState({
+        depthMin: '',
+        depthMax: '',
+        lengthMin: '',
+        lengthMax: '',
+        widthMin: '',
+        widthMax: ''
+    });
 
     useEffect(() => {
         loadObjects();
@@ -96,6 +105,36 @@ export default function MapView() {
 
         return confidences.length > 0 ? Math.max(...confidences) : null;
     };
+
+    const filterObjectsByParams = (objs: PipelineObject[]): PipelineObject[] => {
+        const hasRanges = Object.values(paramRanges).some(v => v !== '');
+        if (!hasRanges) return objs;
+
+        return objs.filter(obj => {
+            if (!obj.inspections || obj.inspections.length === 0) return false;
+
+            return obj.inspections.some(insp => {
+                if (!insp.defect_found) return false;
+
+                const depth = insp.param1 || 0;
+                const length = insp.param2 || 0;
+                const width = insp.param3 || 0;
+
+                const depthMin = paramRanges.depthMin ? parseFloat(paramRanges.depthMin) : -Infinity;
+                const depthMax = paramRanges.depthMax ? parseFloat(paramRanges.depthMax) : Infinity;
+                const lengthMin = paramRanges.lengthMin ? parseFloat(paramRanges.lengthMin) : -Infinity;
+                const lengthMax = paramRanges.lengthMax ? parseFloat(paramRanges.lengthMax) : Infinity;
+                const widthMin = paramRanges.widthMin ? parseFloat(paramRanges.widthMin) : -Infinity;
+                const widthMax = paramRanges.widthMax ? parseFloat(paramRanges.widthMax) : Infinity;
+
+                return depth >= depthMin && depth <= depthMax &&
+                    length >= lengthMin && length <= lengthMax &&
+                    width >= widthMin && width <= widthMax;
+            });
+        });
+    };
+
+    const filteredObjects = filterObjectsByParams(objects);
 
     const center: [number, number] = [48.0196, 66.9237]; // Kazakhstan center
 
@@ -185,12 +224,120 @@ export default function MapView() {
                         </div>
                     </div>
 
-                    <div className="mt-4 flex justify-end">
+                    {/* Advanced Filters */}
+                    <div className="mt-4">
                         <button
-                            onClick={() => setFilters({})}
+                            onClick={() => setShowAdvanced(!showAdvanced)}
+                            className="text-primary-400 hover:text-primary-300 text-sm font-medium transition-colors"
+                        >
+                            {showAdvanced ? '▼' : '▶'} Расширенные фильтры (диапазоны параметров)
+                        </button>
+                    </div>
+
+                    {showAdvanced && (
+                        <div className="mt-4 p-4 bg-slate-700/50 rounded-lg">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                {/* Depth Range */}
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-300 mb-2">
+                                        Глубина (mm)
+                                    </label>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <input
+                                            type="number"
+                                            placeholder="От"
+                                            value={paramRanges.depthMin}
+                                            onChange={(e) => setParamRanges({ ...paramRanges, depthMin: e.target.value })}
+                                            className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                        />
+                                        <input
+                                            type="number"
+                                            placeholder="До"
+                                            value={paramRanges.depthMax}
+                                            onChange={(e) => setParamRanges({ ...paramRanges, depthMax: e.target.value })}
+                                            className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Length Range */}
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-300 mb-2">
+                                        Длина (mm)
+                                    </label>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <input
+                                            type="number"
+                                            placeholder="От"
+                                            value={paramRanges.lengthMin}
+                                            onChange={(e) => setParamRanges({ ...paramRanges, lengthMin: e.target.value })}
+                                            className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                        />
+                                        <input
+                                            type="number"
+                                            placeholder="До"
+                                            value={paramRanges.lengthMax}
+                                            onChange={(e) => setParamRanges({ ...paramRanges, lengthMax: e.target.value })}
+                                            className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Width Range */}
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-300 mb-2">
+                                        Ширина (mm)
+                                    </label>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <input
+                                            type="number"
+                                            placeholder="От"
+                                            value={paramRanges.widthMin}
+                                            onChange={(e) => setParamRanges({ ...paramRanges, widthMin: e.target.value })}
+                                            className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                        />
+                                        <input
+                                            type="number"
+                                            placeholder="До"
+                                            value={paramRanges.widthMax}
+                                            onChange={(e) => setParamRanges({ ...paramRanges, widthMax: e.target.value })}
+                                            className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="mt-4 flex justify-end gap-3">
+                        <button
+                            onClick={() => {
+                                setFilters({});
+                                setParamRanges({
+                                    depthMin: '',
+                                    depthMax: '',
+                                    lengthMin: '',
+                                    lengthMax: '',
+                                    widthMin: '',
+                                    widthMax: ''
+                                });
+                            }}
                             className="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition-colors"
                         >
                             Сбросить фильтры
+                        </button>
+                        <button
+                            onClick={() => {
+                                // Apply parameter range filters
+                                const hasRanges = Object.values(paramRanges).some(v => v !== '');
+                                if (hasRanges) {
+                                    // Filter objects client-side based on parameter ranges
+                                    loadObjects();
+                                }
+                            }}
+                            className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                        >
+                            Применить
                         </button>
                     </div>
                 </div>
@@ -226,7 +373,7 @@ export default function MapView() {
                         ))}
 
                         {/* Object markers */}
-                        {objects.map((obj) => {
+                        {filteredObjects.map((obj) => {
                             const riskLevel = getRiskLevel(obj);
                             const icon = createColoredIcon(RISK_COLORS[riskLevel]);
 
@@ -292,7 +439,10 @@ export default function MapView() {
                     </div>
                 </div>
                 <p className="text-slate-400 text-sm mt-3">
-                    Всего объектов на карте: <strong className="text-white">{objects.length}</strong>
+                    Объектов на карте: <strong className="text-white">{filteredObjects.length}</strong>
+                    {filteredObjects.length !== objects.length && (
+                        <span> из {objects.length} (применены фильтры)</span>
+                    )}
                 </p>
             </div>
         </div>

@@ -14,6 +14,56 @@ from reportlab.lib.enums import TA_CENTER, TA_LEFT
 import os
 
 
+def _generate_excavation_recommendations(inspections) -> str:
+    """Generate excavation recommendations based on high-risk defects"""
+    # Filter high-risk defects and sort by severity
+    high_risk_defects = [
+        insp for insp in inspections 
+        if insp.defect_found and insp.ml_label == 'high'
+    ]
+    
+    # Sort by depth (param1) descending
+    high_risk_defects.sort(key=lambda x: (x.param1 or 0), reverse=True)
+    
+    rows = ""
+    for idx, insp in enumerate(high_risk_defects[:10], 1):  # Top 10
+        priority = "🔴 Высокий" if idx <= 3 else "🟡 Средний" if idx <= 7 else "🟢 Низкий"
+        
+        # Get coordinates from object if available
+        coords = "N/A"
+        if hasattr(insp, 'object') and insp.object:
+            coords = f"{insp.object.lat:.4f}, {insp.object.lon:.4f}"
+        
+        # Defect parameters
+        params = f"Глубина: {insp.param1 or 0}mm, Длина: {insp.param2 or 0}mm, Ширина: {insp.param3 or 0}mm"
+        
+        # Justification
+        justification = f"Критический дефект обнаружен методом {insp.method}. "
+        if insp.quality_grade == 'недопустимо':
+            justification += "Качество недопустимо."
+        elif insp.param1 and insp.param1 > 10:
+            justification += f"Глубина дефекта {insp.param1}mm превышает допустимую."
+        else:
+            justification += "Требуется немедленное вмешательство."
+        
+        rows += f"""
+        <tr>
+            <td style="font-weight: bold;">{priority}</td>
+            <td>{insp.object_id}</td>
+            <td>{coords}</td>
+            <td style="font-size: 0.85em;">{params}</td>
+            <td style="font-size: 0.85em;">{justification}</td>
+        </tr>
+        """
+    
+    if not rows:
+        rows = '<tr><td colspan="5" style="text-align: center; color: #6b7280;">Нет дефектов с высоким уровнем риска</td></tr>'
+    
+    return rows
+
+
+
+
 def generate_html_report(inspections, stats, date_from: Optional[date], date_to: Optional[date]) -> str:
     """Generate HTML report"""
     
@@ -185,6 +235,25 @@ def generate_html_report(inspections, stats, date_from: Optional[date], date_to:
                 </thead>
                 <tbody>
                     {defects_rows}
+                </tbody>
+            </table>
+            
+            <h2>🚧 Рекомендации по раскопкам</h2>
+            <p style="color: #6b7280; margin-bottom: 20px;">
+                На основе анализа дефектов с высоким уровнем риска рекомендуется провести раскопки на следующих участках:
+            </p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Приоритет</th>
+                        <th>ID Объекта</th>
+                        <th>Координаты</th>
+                        <th>Параметры дефекта</th>
+                        <th>Обоснование</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {_generate_excavation_recommendations(inspections)}
                 </tbody>
             </table>
             

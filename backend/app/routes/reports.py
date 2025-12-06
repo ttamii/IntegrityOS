@@ -33,13 +33,20 @@ async def generate_report(
             limit=10000
         )
         
+        # Eagerly load object relationships for excavation recommendations
+        from sqlalchemy.orm import joinedload
+        from app import models
+        inspections_with_objects = db.query(models.Inspection).options(
+            joinedload(models.Inspection.object)
+        ).filter(models.Inspection.id.in_([i.id for i in inspections])).all()
+        
         stats = crud.get_dashboard_stats(db)
         
         if format == "html":
-            html_content = generate_html_report(inspections, stats, date_from, date_to)
+            html_content = generate_html_report(inspections_with_objects, stats, date_from, date_to)
             return HTMLResponse(content=html_content)
         else:
-            pdf_path = generate_pdf_report(inspections, stats, date_from, date_to)
+            pdf_path = generate_pdf_report(inspections_with_objects, stats, date_from, date_to)
             return FileResponse(
                 pdf_path,
                 media_type="application/pdf",
