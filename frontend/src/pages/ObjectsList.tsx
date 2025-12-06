@@ -10,6 +10,7 @@ export default function ObjectsList() {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterType, setFilterType] = useState('');
+    const [sortBy, setSortBy] = useState<'none' | 'depth_asc' | 'depth_desc'>('none');
     const [exporting, setExporting] = useState(false);
 
     useEffect(() => {
@@ -218,12 +219,31 @@ export default function ObjectsList() {
 
                             {/* Inspections History */}
                             <div className="bg-slate-800 rounded-lg p-6">
-                                <h3 className="text-lg font-semibold text-white mb-4">
-                                    История обследований ({inspections.length})
-                                </h3>
+                                <div className="flex items-center justify-between mb-4">
+                                    <h3 className="text-lg font-semibold text-white">
+                                        История обследований ({inspections.length})
+                                    </h3>
+                                    <select
+                                        value={sortBy}
+                                        onChange={(e) => setSortBy(e.target.value as any)}
+                                        className="px-3 py-1 bg-slate-700 border border-slate-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                    >
+                                        <option value="none">По дате</option>
+                                        <option value="depth_asc">По глубине ↑</option>
+                                        <option value="depth_desc">По глубине ↓</option>
+                                    </select>
+                                </div>
                                 <div className="space-y-3 max-h-[400px] overflow-y-auto">
                                     {inspections.length > 0 ? (
-                                        inspections.map((insp) => (
+                                        (() => {
+                                            let sorted = [...inspections];
+                                            if (sortBy === 'depth_asc') {
+                                                sorted.sort((a, b) => (a.param1 || 0) - (b.param1 || 0));
+                                            } else if (sortBy === 'depth_desc') {
+                                                sorted.sort((a, b) => (b.param1 || 0) - (a.param1 || 0));
+                                            }
+                                            return sorted;
+                                        })().map((insp) => (
                                             <div key={insp.diag_id} className="bg-slate-700 rounded-lg p-4">
                                                 <div className="flex items-start justify-between mb-2">
                                                     <div>
@@ -256,6 +276,11 @@ export default function ObjectsList() {
                                                         {insp.param1 && (
                                                             <p className="text-slate-300 text-sm mt-1">
                                                                 <strong>Параметры:</strong> {insp.param1}mm × {insp.param2}mm × {insp.param3}mm
+                                                            </p>
+                                                        )}
+                                                        {insp.ml_confidence && (
+                                                            <p className="text-slate-300 text-sm mt-1">
+                                                                <strong>Уверенность ML:</strong> {(insp.ml_confidence * 100).toFixed(0)}%
                                                             </p>
                                                         )}
                                                     </div>

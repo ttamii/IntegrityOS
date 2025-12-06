@@ -87,6 +87,16 @@ export default function MapView() {
         return 'normal';
     };
 
+    const getHighestConfidence = (obj: PipelineObject): number | null => {
+        if (!obj.inspections || obj.inspections.length === 0) return null;
+
+        const confidences = obj.inspections
+            .filter(i => i.ml_confidence !== undefined && i.ml_confidence !== null)
+            .map(i => i.ml_confidence!);
+
+        return confidences.length > 0 ? Math.max(...confidences) : null;
+    };
+
     const center: [number, number] = [48.0196, 66.9237]; // Kazakhstan center
 
     return (
@@ -109,7 +119,7 @@ export default function MapView() {
             {/* Filters Panel */}
             {showFilters && (
                 <div className="bg-slate-800 rounded-lg p-6 card-hover">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div>
                             <label className="block text-sm font-medium text-slate-300 mb-2">
                                 Уровень риска
@@ -123,6 +133,30 @@ export default function MapView() {
                                 <option value="normal">Низкий</option>
                                 <option value="medium">Средний</option>
                                 <option value="high">Высокий</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-slate-300 mb-2">
+                                Метод контроля
+                            </label>
+                            <select
+                                value={filters.method || ''}
+                                onChange={(e) => setFilters({ ...filters, method: e.target.value as any || undefined })}
+                                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                            >
+                                <option value="">Все методы</option>
+                                <option value="VIK">VIK</option>
+                                <option value="PVK">PVK</option>
+                                <option value="MPK">MPK</option>
+                                <option value="UZK">UZK</option>
+                                <option value="RGK">RGK</option>
+                                <option value="TVK">TVK</option>
+                                <option value="VIBRO">VIBRO</option>
+                                <option value="MFL">MFL</option>
+                                <option value="TFI">TFI</option>
+                                <option value="GEO">GEO</option>
+                                <option value="UTWM">UTWM</option>
                             </select>
                         </div>
 
@@ -220,6 +254,12 @@ export default function MapView() {
                                                         {riskLevel.toUpperCase()}
                                                     </span>
                                                 </p>
+                                                {(() => {
+                                                    const confidence = getHighestConfidence(obj);
+                                                    return confidence !== null ? (
+                                                        <p><strong>Уверенность ML:</strong> {(confidence * 100).toFixed(0)}%</p>
+                                                    ) : null;
+                                                })()}
                                             </div>
                                         </div>
                                     </Popup>

@@ -87,4 +87,5 @@ export interface InspectionFilter {
     risk_level?: RiskLevel;
     pipeline_id?: string;
     object_type?: string;
+    object_id?: number;
 }
