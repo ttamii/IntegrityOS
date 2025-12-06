@@ -61,6 +61,7 @@ export default function DefectManagement() {
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
     const [selectedWork, setSelectedWork] = useState<RepairWork | null>(null);
     const [workMedia, setWorkMedia] = useState<Media[]>([]);
+    const [zoomedImage, setZoomedImage] = useState<string | null>(null);
 
     const [workForm, setWorkForm] = useState({
         title: '',
@@ -911,14 +912,15 @@ export default function DefectManagement() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     {/* Before Photos */}
                                     <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                                        <h5 className="font-medium text-red-800 mb-3">📷 До ремонта</h5>
+                                        <h5 className="font-medium text-red-800 mb-3">📷 До ремонта (нажмите для увеличения)</h5>
                                         <div className="grid grid-cols-2 gap-2">
                                             {workMedia.filter(m => m.is_before).map((m) => (
                                                 <img
                                                     key={m.id}
                                                     src={`${API_URL}/api/media/file/${m.id}`}
                                                     alt="До ремонта"
-                                                    className="w-full h-32 object-cover rounded-lg border-2 border-red-300"
+                                                    className="w-full h-32 object-cover rounded-lg border-2 border-red-300 cursor-zoom-in hover:opacity-80 transition-opacity"
+                                                    onClick={() => setZoomedImage(`${API_URL}/api/media/file/${m.id}`)}
                                                 />
                                             ))}
                                             {workMedia.filter(m => m.is_before).length === 0 && (
@@ -929,14 +931,15 @@ export default function DefectManagement() {
 
                                     {/* After Photos */}
                                     <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                                        <h5 className="font-medium text-green-800 mb-3">📷 После ремонта</h5>
+                                        <h5 className="font-medium text-green-800 mb-3">📷 После ремонта (нажмите для увеличения)</h5>
                                         <div className="grid grid-cols-2 gap-2">
                                             {workMedia.filter(m => !m.is_before).map((m) => (
                                                 <img
                                                     key={m.id}
                                                     src={`${API_URL}/api/media/file/${m.id}`}
                                                     alt="После ремонта"
-                                                    className="w-full h-32 object-cover rounded-lg border-2 border-green-300"
+                                                    className="w-full h-32 object-cover rounded-lg border-2 border-green-300 cursor-zoom-in hover:opacity-80 transition-opacity"
+                                                    onClick={() => setZoomedImage(`${API_URL}/api/media/file/${m.id}`)}
                                                 />
                                             ))}
                                             {workMedia.filter(m => !m.is_before).length === 0 && (
@@ -991,6 +994,28 @@ export default function DefectManagement() {
                             </div>
                         )}
                     </div>
+                </div>
+            )}
+
+            {/* Fullscreen Image Lightbox */}
+            {zoomedImage && (
+                <div
+                    className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-[60] cursor-zoom-out"
+                    onClick={() => setZoomedImage(null)}
+                >
+                    <button
+                        className="absolute top-4 right-4 text-white hover:text-gray-300 z-10"
+                        onClick={() => setZoomedImage(null)}
+                    >
+                        <X className="w-8 h-8" />
+                    </button>
+                    <img
+                        src={zoomedImage}
+                        alt="Увеличенное фото"
+                        className="max-w-[95vw] max-h-[95vh] object-contain rounded-lg shadow-2xl"
+                        onClick={(e) => e.stopPropagation()}
+                    />
+                    <p className="absolute bottom-4 text-white text-sm">Нажмите в любом месте для закрытия</p>
                 </div>
             )}
         </div>
