@@ -9,7 +9,8 @@ import {
     Settings,
     LogOut,
     ChevronLeft,
-    ChevronRight
+    ChevronRight,
+    AlertTriangle
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -25,6 +26,7 @@ export default function Sidebar({ userRole = 'guest' }: SidebarProps) {
         { path: '/', icon: LayoutDashboard, label: 'Панель управления', roles: ['admin', 'inspector', 'analyst', 'guest'] },
         { path: '/map', icon: Map, label: 'Карта объектов', roles: ['admin', 'inspector', 'analyst', 'guest'] },
         { path: '/objects', icon: FileText, label: 'Объекты', roles: ['admin', 'inspector', 'analyst', 'guest'] },
+        { path: '/defects', icon: AlertTriangle, label: 'Дефекты', roles: ['admin', 'inspector'] },
         { path: '/import', icon: Upload, label: 'Импорт данных', roles: ['admin', 'inspector'] },
         { path: '/reports', icon: BarChart3, label: 'Отчёты', roles: ['admin', 'inspector', 'analyst'] },
         { path: '/users', icon: Users, label: 'Пользователи', roles: ['admin'] },

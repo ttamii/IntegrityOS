@@ -188,3 +188,78 @@ class InspectionFilter(BaseModel):
     risk_level: Optional[RiskLevel] = None
     pipeline_id: Optional[str] = None
     object_type: Optional[ObjectType] = None
+
+
+# Media Schemas
+class MediaType(str, Enum):
+    PHOTO = "photo"
+    VIDEO = "video"
+
+
+class MediaBase(BaseModel):
+    description: Optional[str] = None
+    is_before: bool = True
+
+
+class MediaCreate(MediaBase):
+    inspection_id: int
+
+
+class MediaResponse(MediaBase):
+    id: int
+    inspection_id: int
+    media_type: MediaType
+    filename: str
+    original_name: Optional[str]
+    file_path: str
+    uploaded_by: Optional[int]
+    uploaded_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+# Repair Work Schemas
+class WorkStatus(str, Enum):
+    PLANNED = "planned"
+    IN_PROGRESS = "in_progress"
+    COMPLETED = "completed"
+    CANCELLED = "cancelled"
+
+
+class RepairWorkBase(BaseModel):
+    title: str
+    description: Optional[str] = None
+    priority: str = "medium"
+    planned_date: Optional[date] = None
+    assigned_to: Optional[int] = None
+    notes: Optional[str] = None
+
+
+class RepairWorkCreate(RepairWorkBase):
+    inspection_id: int
+
+
+class RepairWorkUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    priority: Optional[str] = None
+    status: Optional[WorkStatus] = None
+    planned_date: Optional[date] = None
+    completed_date: Optional[date] = None
+    assigned_to: Optional[int] = None
+    notes: Optional[str] = None
+
+
+class RepairWorkResponse(RepairWorkBase):
+    id: int
+    inspection_id: int
+    status: WorkStatus
+    completed_date: Optional[date]
+    created_by: int
+    created_at: datetime
+    updated_at: Optional[datetime]
+
+    class Config:
+        from_attributes = True
+

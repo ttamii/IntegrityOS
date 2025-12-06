@@ -8,6 +8,7 @@ import ImportData from './pages/ImportData';
 import Reports from './pages/Reports';
 import About from './pages/About';
 import Login from './pages/Login';
+import DefectManagement from './pages/DefectManagement';
 import { LogOut } from 'lucide-react';
 
 // Protected Route wrapper
@@ -96,6 +97,7 @@ function MainLayout() {
                         <Route path="/" element={<Dashboard />} />
                         <Route path="/map" element={<MapView />} />
                         <Route path="/objects" element={<ObjectsList />} />
+                        <Route path="/defects" element={<DefectManagement />} />
                         <Route path="/import" element={<ImportData />} />
                         <Route path="/reports" element={<Reports />} />
                         <Route path="/about" element={<About />} />

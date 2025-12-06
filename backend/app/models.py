@@ -114,3 +114,59 @@ class Inspection(Base):
 
     # Relationships
     object = relationship("Object", back_populates="inspections")
+    media = relationship("Media", back_populates="inspection")
+    repair_works = relationship("RepairWork", back_populates="inspection")
+
+
+class MediaType(str, enum.Enum):
+    PHOTO = "photo"
+    VIDEO = "video"
+
+
+class Media(Base):
+    __tablename__ = "media"
+
+    id = Column(Integer, primary_key=True, index=True)
+    inspection_id = Column(Integer, ForeignKey("inspections.id"), nullable=False)
+    media_type = Column(Enum(MediaType), default=MediaType.PHOTO)
+    filename = Column(String(255), nullable=False)
+    original_name = Column(String(255))
+    file_path = Column(String(500), nullable=False)
+    description = Column(Text)
+    is_before = Column(Boolean, default=True)  # True = до ремонта, False = после
+    uploaded_by = Column(Integer, ForeignKey("users.id"))
+    uploaded_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    # Relationships
+    inspection = relationship("Inspection", back_populates="media")
+    uploader = relationship("User")
+
+
+class WorkStatus(str, enum.Enum):
+    PLANNED = "planned"
+    IN_PROGRESS = "in_progress"
+    COMPLETED = "completed"
+    CANCELLED = "cancelled"
+
+
+class RepairWork(Base):
+    __tablename__ = "repair_works"
+
+    id = Column(Integer, primary_key=True, index=True)
+    inspection_id = Column(Integer, ForeignKey("inspections.id"), nullable=False)
+    title = Column(String(255), nullable=False)
+    description = Column(Text)
+    priority = Column(String(20), default="medium")  # low, medium, high, critical
+    status = Column(Enum(WorkStatus), default=WorkStatus.PLANNED)
+    planned_date = Column(Date)
+    completed_date = Column(Date)
+    assigned_to = Column(Integer, ForeignKey("users.id"))
+    created_by = Column(Integer, ForeignKey("users.id"), nullable=False)
+    notes = Column(Text)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    # Relationships
+    inspection = relationship("Inspection", back_populates="repair_works")
+    assignee = relationship("User", foreign_keys=[assigned_to])
+    creator = relationship("User", foreign_keys=[created_by])

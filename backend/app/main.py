@@ -5,7 +5,7 @@ import os
 from dotenv import load_dotenv
 
 from app.database import init_db, SessionLocal
-from app.routes import objects, inspections, dashboard, import_data, reports, admin, auth
+from app.routes import objects, inspections, dashboard, import_data, reports, admin, auth, media, repair_works
 from app import models
 from app.auth import get_password_hash
 
@@ -76,6 +76,8 @@ app.include_router(dashboard.router, prefix="/api/dashboard", tags=["Dashboard"]
 app.include_router(import_data.router, prefix="/api/import", tags=["Import"])
 app.include_router(reports.router, prefix="/api/reports", tags=["Reports"])
 app.include_router(admin.router, prefix="/api/admin", tags=["Admin"])
+app.include_router(media.router, prefix="/api/media", tags=["Media"])
+app.include_router(repair_works.router, prefix="/api/works", tags=["Repair Works"])
 
 
 @app.get("/")
