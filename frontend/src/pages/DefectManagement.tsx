@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import {
     AlertTriangle, Camera, Wrench, CheckCircle,
-    Plus, X, Upload, Calendar, XCircle, SortAsc, SortDesc, Clock, List
+    Plus, X, Upload, Calendar, XCircle, SortAsc, SortDesc, Clock, List, FileDown
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -993,48 +993,54 @@ export default function DefectManagement() {
                             </div>
                         </div>
 
-                        {/* Modal Footer - Approval Buttons */}
-                        {isAdmin && selectedWork.status === 'pending_approval' && (
-                            <div className="p-6 border-t border-gray-200 bg-gray-50 flex items-center justify-between">
-                                <p className="text-sm text-gray-600">
-                                    Проверьте фотографии до и после ремонта перед принятием решения
-                                </p>
-                                <div className="flex space-x-3">
-                                    <button
-                                        onClick={() => {
-                                            handleApprove(selectedWork.id, false);
-                                            setSelectedWork(null);
-                                        }}
-                                        className="flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-                                    >
-                                        <XCircle className="w-4 h-4 mr-2" />
-                                        Вернуть на доработку
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            handleApprove(selectedWork.id, true);
-                                            setSelectedWork(null);
-                                        }}
-                                        className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-                                    >
-                                        <CheckCircle className="w-4 h-4 mr-2" />
-                                        Принять работу
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Close button for non-pending works */}
-                        {selectedWork.status !== 'pending_approval' && (
-                            <div className="p-6 border-t border-gray-200 bg-gray-50 flex justify-end">
+                        {/* Modal Footer */}
+                        <div className="p-6 border-t border-gray-200 bg-gray-50">
+                            <div className="flex items-center justify-between">
+                                {/* Download PDF Button */}
                                 <button
-                                    onClick={() => setSelectedWork(null)}
-                                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+                                    onClick={() => {
+                                        window.open(`${API_URL}/api/reports/defect/${selectedWork.id}/pdf`, '_blank');
+                                    }}
+                                    className="flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
                                 >
-                                    Закрыть
+                                    <FileDown className="w-4 h-4 mr-2" />
+                                    Скачать PDF отчёт
                                 </button>
+
+                                {/* Approval Buttons (Admin Only) */}
+                                {isAdmin && selectedWork.status === 'pending_approval' ? (
+                                    <div className="flex space-x-3">
+                                        <button
+                                            onClick={() => {
+                                                handleApprove(selectedWork.id, false);
+                                                setSelectedWork(null);
+                                            }}
+                                            className="flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                                        >
+                                            <XCircle className="w-4 h-4 mr-2" />
+                                            Вернуть на доработку
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                handleApprove(selectedWork.id, true);
+                                                setSelectedWork(null);
+                                            }}
+                                            className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                                        >
+                                            <CheckCircle className="w-4 h-4 mr-2" />
+                                            Принять работу
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <button
+                                        onClick={() => setSelectedWork(null)}
+                                        className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+                                    >
+                                        Закрыть
+                                    </button>
+                                )}
                             </div>
-                        )}
+                        </div>
                     </div>
                 </div>
             )}
