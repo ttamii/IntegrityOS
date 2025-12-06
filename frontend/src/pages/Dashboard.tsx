@@ -242,16 +242,17 @@ interface StatCardProps {
 
 function StatCard({ icon, label, value, color }: StatCardProps) {
     return (
-        <div className="bg-white rounded-lg p-6 card-hover">
+        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
                 <div>
-                    <p className="text-gray-600 text-sm mb-1">{label}</p>
+                    <p className="text-sm font-medium text-gray-600 mb-1">{label}</p>
                     <p className="text-3xl font-bold text-gray-900">{value}</p>
                 </div>
-                <div className={`${color} p-3 rounded-lg text-gray-900`}>
+                <div className={`${color} p-4 rounded-xl text-white shadow-sm`}>
                     {icon}
                 </div>
             </div>
         </div>
     );
 }
+
