@@ -205,7 +205,7 @@ export default function Dashboard() {
                             </thead>
                             <tbody>
                                 {stats.top_risks.map((risk, index) => (
-                                    <tr key={index} className="border-b border-gray-200 hover:bg-slate-700/50 transition-colors">
+                                    <tr key={index} className="border-b border-gray-200 hover:bg-white/50 transition-colors">
                                         <td className="py-3 px-4 text-gray-900">{risk.object_name}</td>
                                         <td className="py-3 px-4 text-gray-700">{risk.description || 'N/A'}</td>
                                         <td className="py-3 px-4">

@@ -76,11 +76,11 @@ export default function ImportData() {
                 <h2 className="text-lg font-semibold text-blue-300 mb-3">📋 Инструкции</h2>
                 <div className="space-y-2 text-gray-700 text-sm">
                     <p>• Поддерживаемые форматы: <strong>CSV</strong> и <strong>XLSX</strong></p>
-                    <p>• Для объектов: файл должен содержать колонки <code className="bg-slate-700 px-2 py-1 rounded">object_id, object_name, object_type, pipeline_id, lat, lon</code></p>
-                    <p>• Для диагностик: файл должен содержать колонки <code className="bg-slate-700 px-2 py-1 rounded">diag_id, object_id, method, date, defect_found</code></p>
+                    <p>• Для объектов: файл должен содержать колонки <code className="bg-white px-2 py-1 rounded">object_id, object_name, object_type, pipeline_id, lat, lon</code></p>
+                    <p>• Для диагностик: файл должен содержать колонки <code className="bg-white px-2 py-1 rounded">diag_id, object_id, method, date, defect_found</code></p>
                     <p>• Максимальный размер файла: <strong>50 MB</strong></p>
                     <p className="text-yellow-300 mt-3">
-                        💡 <strong>Примечание:</strong> Организаторы пришлют реальный датасет позже. Пока можно использовать сгенерированные тестовые данные.
+                        <strong>Примечание:</strong> Организаторы пришлют реальный датасет позже. Пока можно использовать сгенерированные тестовые данные.
                     </p>
                 </div>
             </div>
@@ -94,8 +94,8 @@ export default function ImportData() {
                         onDragOver={handleDrag}
                         onDrop={handleDrop}
                         className={`border-2 border-dashed rounded-lg p-12 text-center transition-colors ${dragActive
-                                ? 'border-primary-500 bg-primary-900/20'
-                                : 'border-gray-300 hover:border-slate-500'
+                            ? 'border-primary-500 bg-primary-900/20'
+                            : 'border-gray-300 hover:border-slate-500'
                             }`}
                     >
                         <Upload className="h-16 w-16 text-gray-600 mx-auto mb-4" />
@@ -115,7 +115,7 @@ export default function ImportData() {
                 ) : (
                     <div className="space-y-4">
                         {/* File Info */}
-                        <div className="flex items-center justify-between bg-slate-700 rounded-lg p-4">
+                        <div className="flex items-center justify-between bg-white rounded-lg p-4">
                             <div className="flex items-center">
                                 <FileText className="h-8 w-8 text-primary-400 mr-3" />
                                 <div>
@@ -192,7 +192,7 @@ export default function ImportData() {
                             {/* Warnings */}
                             {result.warnings.length > 0 && (
                                 <div className="mb-4">
-                                    <h4 className="text-yellow-300 font-medium mb-2">⚠️ Предупреждения:</h4>
+                                    <h4 className="text-yellow-600 font-medium mb-2">Предупреждения:</h4>
                                     <div className="bg-white/50 rounded p-3 max-h-40 overflow-y-auto">
                                         {result.warnings.map((warning, index) => (
                                             <p key={index} className="text-yellow-200 text-sm mb-1">• {warning}</p>
@@ -204,7 +204,7 @@ export default function ImportData() {
                             {/* Errors */}
                             {result.errors.length > 0 && (
                                 <div>
-                                    <h4 className="text-red-300 font-medium mb-2">❌ Ошибки:</h4>
+                                    <h4 className="text-red-600 font-medium mb-2">Ошибки:</h4>
                                     <div className="bg-white/50 rounded p-3 max-h-40 overflow-y-auto">
                                         {result.errors.map((error, index) => (
                                             <p key={index} className="text-red-200 text-sm mb-1">• {error}</p>
@@ -216,7 +216,7 @@ export default function ImportData() {
                             {/* New Import Button */}
                             <button
                                 onClick={resetImport}
-                                className="mt-4 px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition-colors"
+                                className="mt-4 px-4 py-2 bg-white text-white rounded-lg hover:bg-gray-100 transition-colors"
                             >
                                 Импортировать другой файл
                             </button>
@@ -227,9 +227,9 @@ export default function ImportData() {
 
             {/* Sample Data Info */}
             <div className="bg-white rounded-lg p-6">
-                <h2 className="text-lg font-semibold text-white mb-3">📁 Тестовые данные</h2>
+                <h2 className="text-lg font-semibold text-gray-900 mb-3">Тестовые данные</h2>
                 <p className="text-gray-700 mb-4">
-                    Для тестирования системы используйте сгенерированные файлы из директории <code className="bg-slate-700 px-2 py-1 rounded">backend/data/</code>
+                    Для тестирования системы используйте сгенерированные файлы из директории <code className="bg-white px-2 py-1 rounded">backend/data/</code>
                 </p>
                 <div className="space-y-2 text-sm text-gray-600">
                     <p>• <strong>Objects.csv</strong> - объекты контроля (краны, компрессоры, участки труб)</p>

@@ -60,38 +60,38 @@ export default function About() {
             <div className="bg-white rounded-lg p-6 card-hover">
                 <h2 className="text-xl font-semibold text-white mb-4">Основной функционал</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div className="bg-slate-700 rounded-lg p-4">
-                        <h3 className="font-medium text-white mb-2">📊 Аналитический дашборд</h3>
+                    <div className="bg-white rounded-lg p-4">
+                        <h3 className="font-medium text-gray-900 mb-2">Аналитический дашборд</h3>
                         <p className="text-sm text-gray-600">
                             5 интерактивных графиков с статистикой по обследованиям, дефектам и рискам
                         </p>
                     </div>
-                    <div className="bg-slate-700 rounded-lg p-4">
-                        <h3 className="font-medium text-white mb-2">🗺️ Интерактивная карта</h3>
+                    <div className="bg-white rounded-lg p-4">
+                        <h3 className="font-medium text-gray-900 mb-2">Интерактивная карта</h3>
                         <p className="text-sm text-gray-600">
                             Визуализация объектов с цветовой кодировкой по уровню риска и фильтрами
                         </p>
                     </div>
-                    <div className="bg-slate-700 rounded-lg p-4">
+                    <div className="bg-white rounded-lg p-4">
                         <h3 className="font-medium text-white mb-2">🤖 ML-классификация</h3>
                         <p className="text-sm text-gray-600">
                             RandomForest модель с точностью 94.74% для автоматической оценки рисков
                         </p>
                     </div>
-                    <div className="bg-slate-700 rounded-lg p-4">
+                    <div className="bg-white rounded-lg p-4">
                         <h3 className="font-medium text-white mb-2">📥 Импорт данных</h3>
                         <p className="text-sm text-gray-600">
                             Загрузка CSV/XLSX файлов с валидацией и обработкой ошибок
                         </p>
                     </div>
-                    <div className="bg-slate-700 rounded-lg p-4">
-                        <h3 className="font-medium text-white mb-2">📄 Генерация отчетов</h3>
+                    <div className="bg-white rounded-lg p-4">
+                        <h3 className="font-medium text-gray-900 mb-2">Генерация отчетов</h3>
                         <p className="text-sm text-gray-600">
                             Экспорт аналитических отчетов в HTML и PDF форматах
                         </p>
                     </div>
-                    <div className="bg-slate-700 rounded-lg p-4">
-                        <h3 className="font-medium text-white mb-2">🔍 Поиск и фильтрация</h3>
+                    <div className="bg-white rounded-lg p-4">
+                        <h3 className="font-medium text-gray-900 mb-2">Поиск и фильтрация</h3>
                         <p className="text-sm text-gray-600">
                             Расширенные фильтры по методам контроля, датам и уровням риска
                         </p>
@@ -104,15 +104,15 @@ export default function About() {
                 <h2 className="text-xl font-semibold text-white mb-4">ML-модель классификации рисков</h2>
                 <div className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="bg-slate-700 rounded-lg p-4 text-center">
+                        <div className="bg-white rounded-lg p-4 text-center">
                             <div className="text-3xl font-bold text-primary-400">94.74%</div>
                             <div className="text-sm text-gray-600 mt-1">Точность модели</div>
                         </div>
-                        <div className="bg-slate-700 rounded-lg p-4 text-center">
+                        <div className="bg-white rounded-lg p-4 text-center">
                             <div className="text-3xl font-bold text-primary-400">11</div>
                             <div className="text-sm text-gray-600 mt-1">Признаков</div>
                         </div>
-                        <div className="bg-slate-700 rounded-lg p-4 text-center">
+                        <div className="bg-white rounded-lg p-4 text-center">
                             <div className="text-3xl font-bold text-primary-400">91</div>
                             <div className="text-sm text-gray-600 mt-1">Дефектов в обучении</div>
                         </div>

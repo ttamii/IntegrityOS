@@ -101,7 +101,7 @@ export default function ObjectsList() {
                             placeholder="Поиск по названию или ID..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 bg-slate-700 border border-gray-300 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                            className="w-full pl-10 pr-4 py-2 bg-white border border-gray-300 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
                         />
                     </div>
 
@@ -110,7 +110,7 @@ export default function ObjectsList() {
                         <select
                             value={filterType}
                             onChange={(e) => setFilterType(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 bg-slate-700 border border-gray-300 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                            className="w-full pl-10 pr-4 py-2 bg-white border border-gray-300 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                         >
                             <option value="">Все типы</option>
                             <option value="crane">Краны</option>
@@ -151,11 +151,11 @@ export default function ObjectsList() {
                                                 ID: {obj.object_id} • {obj.pipeline_id}
                                             </p>
                                             <div className="flex gap-2 mt-2">
-                                                <span className="px-2 py-1 bg-slate-600 text-gray-700 rounded text-xs">
+                                                <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">
                                                     {obj.object_type}
                                                 </span>
                                                 {obj.year && (
-                                                    <span className="px-2 py-1 bg-slate-600 text-gray-700 rounded text-xs">
+                                                    <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">
                                                         {obj.year}
                                                     </span>
                                                 )}
@@ -226,7 +226,7 @@ export default function ObjectsList() {
                                     <select
                                         value={sortBy}
                                         onChange={(e) => setSortBy(e.target.value as any)}
-                                        className="px-3 py-1 bg-slate-700 border border-gray-300 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                        className="px-3 py-1 bg-white border border-gray-300 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
                                     >
                                         <option value="none">По дате</option>
                                         <option value="depth_asc">По глубине ↑</option>
@@ -244,7 +244,7 @@ export default function ObjectsList() {
                                             }
                                             return sorted;
                                         })().map((insp) => (
-                                            <div key={insp.diag_id} className="bg-slate-700 rounded-lg p-4">
+                                            <div key={insp.diag_id} className="bg-white rounded-lg p-4">
                                                 <div className="flex items-start justify-between mb-2">
                                                     <div>
                                                         <span className="text-white font-medium">{insp.method}</span>
