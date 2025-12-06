@@ -110,16 +110,16 @@ export default function Dashboard() {
             {/* Charts Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Defects by Method */}
-                <div className="bg-white rounded-lg p-6 card-hover">
+                <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
                     <h2 className="text-xl font-semibold text-gray-900 mb-4">Дефекты по методам контроля</h2>
                     <ResponsiveContainer width="100%" height={300}>
                         <BarChart data={methodsData}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                            <XAxis dataKey="method" stroke="#94a3b8" />
-                            <YAxis stroke="#94a3b8" />
+                            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                            <XAxis dataKey="method" stroke="#6b7280" />
+                            <YAxis stroke="#6b7280" />
                             <Tooltip
-                                contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155' }}
-                                labelStyle={{ color: '#e2e8f0' }}
+                                contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb' }}
+                                labelStyle={{ color: '#374151' }}
                             />
                             <Bar dataKey="count" fill="#3b82f6" />
                         </BarChart>
@@ -127,7 +127,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* Risk Distribution */}
-                <div className="bg-white rounded-lg p-6 card-hover">
+                <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
                     <h2 className="text-xl font-semibold text-gray-900 mb-4">Распределение по уровням риска</h2>
                     <ResponsiveContainer width="100%" height={300}>
                         <PieChart>
@@ -146,23 +146,23 @@ export default function Dashboard() {
                                 ))}
                             </Pie>
                             <Tooltip
-                                contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155' }}
+                                contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb' }}
                             />
                         </PieChart>
                     </ResponsiveContainer>
                 </div>
 
                 {/* Inspections Timeline */}
-                <div className="bg-white rounded-lg p-6 card-hover">
+                <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
                     <h2 className="text-xl font-semibold text-gray-900 mb-4">Динамика обследований по годам</h2>
                     <ResponsiveContainer width="100%" height={300}>
                         <LineChart data={yearsData}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                            <XAxis dataKey="year" stroke="#94a3b8" />
-                            <YAxis stroke="#94a3b8" />
+                            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                            <XAxis dataKey="year" stroke="#6b7280" />
+                            <YAxis stroke="#6b7280" />
                             <Tooltip
-                                contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155' }}
-                                labelStyle={{ color: '#e2e8f0' }}
+                                contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb' }}
+                                labelStyle={{ color: '#374151' }}
                             />
                             <Legend />
                             <Line type="monotone" dataKey="count" stroke="#3b82f6" strokeWidth={2} name="Обследований" />
@@ -171,21 +171,27 @@ export default function Dashboard() {
                 </div>
 
                 {/* Defects Timeline */}
-                <div className="bg-white rounded-lg p-6 card-hover">
+                <div className="bg-white rounded-lg p-6 card-hover shadow-sm border border-gray-200">
                     <h2 className="text-xl font-semibold text-gray-900 mb-4">Динамика дефектов по годам</h2>
-                    <ResponsiveContainer width="100%" height={300}>
-                        <LineChart data={defectsYearsData}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                            <XAxis dataKey="year" stroke="#94a3b8" />
-                            <YAxis stroke="#94a3b8" />
-                            <Tooltip
-                                contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155' }}
-                                labelStyle={{ color: '#e2e8f0' }}
-                            />
-                            <Legend />
-                            <Line type="monotone" dataKey="count" stroke="#f87171" strokeWidth={2} name="Дефектов" />
-                        </LineChart>
-                    </ResponsiveContainer>
+                    {defectsYearsData.length > 0 ? (
+                        <ResponsiveContainer width="100%" height={300}>
+                            <LineChart data={defectsYearsData}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                                <XAxis dataKey="year" stroke="#6b7280" />
+                                <YAxis stroke="#6b7280" />
+                                <Tooltip
+                                    contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb' }}
+                                    labelStyle={{ color: '#374151' }}
+                                />
+                                <Legend />
+                                <Line type="monotone" dataKey="count" stroke="#ef4444" strokeWidth={2} name="Дефектов" />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    ) : (
+                        <div className="flex items-center justify-center h-[300px] text-gray-500">
+                            Нет данных о дефектах по годам
+                        </div>
+                    )}
                 </div>
             </div>
 
