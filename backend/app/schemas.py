@@ -129,6 +129,7 @@ class DashboardStats(BaseModel):
     defects_by_method: dict
     defects_by_risk: dict
     inspections_by_year: dict
+    defects_by_year: dict = {}
     top_risks: List[dict]
 
 

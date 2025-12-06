@@ -122,11 +122,11 @@ def get_dashboard_stats(db: Session):
         models.Inspection.ml_label.isnot(None)
     ).group_by(models.Inspection.ml_label).all()
     
-    # Inspections by year
+    # Inspections by year (using strftime for SQLite compatibility)
     inspections_by_year = db.query(
-        func.extract('year', models.Inspection.date).label('year'),
+        func.strftime('%Y', models.Inspection.date).label('year'),
         func.count(models.Inspection.id).label('count')
-    ).group_by('year').order_by('year').all()
+    ).group_by(func.strftime('%Y', models.Inspection.date)).all()
     
     # Top 5 high-risk objects
     top_risks = db.query(
@@ -144,13 +144,13 @@ def get_dashboard_stats(db: Session):
         models.Inspection.ml_confidence.desc()
     ).limit(5).all()
     
-    # Defects by year
+    # Defects by year (using strftime for SQLite compatibility)
     defects_by_year = db.query(
-        func.extract('year', models.Inspection.date).label('year'),
+        func.strftime('%Y', models.Inspection.date).label('year'),
         func.count(models.Inspection.id).label('count')
     ).filter(
         models.Inspection.defect_found == True
-    ).group_by('year').order_by('year').all()
+    ).group_by(func.strftime('%Y', models.Inspection.date)).all()
     
     return {
         "total_objects": total_objects,
@@ -158,8 +158,8 @@ def get_dashboard_stats(db: Session):
         "total_defects": total_defects,
         "defects_by_method": {method.value if hasattr(method, 'value') else str(method): count for method, count in defects_by_method},
         "defects_by_risk": {risk.value if hasattr(risk, 'value') else str(risk): count for risk, count in defects_by_risk},
-        "inspections_by_year": {int(year): count for year, count in inspections_by_year},
-        "defects_by_year": {int(year): count for year, count in defects_by_year},
+        "inspections_by_year": {str(year): count for year, count in inspections_by_year if year},
+        "defects_by_year": {str(year): count for year, count in defects_by_year if year},
         "top_risks": [
             {
                 "object_name": name,
