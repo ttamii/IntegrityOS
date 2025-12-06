@@ -59,6 +59,8 @@ export default function DefectManagement() {
     const [uploading, setUploading] = useState(false);
     const [sortBy, setSortBy] = useState<SortType>('date');
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+    const [selectedWork, setSelectedWork] = useState<RepairWork | null>(null);
+    const [workMedia, setWorkMedia] = useState<Media[]>([]);
 
     const [workForm, setWorkForm] = useState({
         title: '',
@@ -122,6 +124,21 @@ export default function DefectManagement() {
         } catch (error) {
             console.error('Error fetching media:', error);
         }
+    };
+
+    const fetchWorkMedia = async (inspectionId: number) => {
+        try {
+            const response = await fetch(`${API_URL}/api/media/inspection/${inspectionId}`);
+            const data = await response.json();
+            setWorkMedia(data);
+        } catch (error) {
+            console.error('Error fetching work media:', error);
+        }
+    };
+
+    const openWorkDetails = (work: RepairWork) => {
+        setSelectedWork(work);
+        fetchWorkMedia(work.inspection_id);
     };
 
     const handleCreateWork = async (e: React.FormEvent) => {
@@ -340,8 +357,8 @@ export default function DefectManagement() {
                         <div className="flex items-center space-x-2 px-3 py-1.5 bg-blue-50 rounded-lg">
                             <span className="text-sm text-gray-600">{user.full_name}</span>
                             <span className={`text-xs px-2 py-0.5 rounded font-medium ${user.role === 'admin' ? 'bg-red-100 text-red-700' :
-                                    user.role === 'inspector' ? 'bg-blue-100 text-blue-700' :
-                                        'bg-gray-100 text-gray-700'
+                                user.role === 'inspector' ? 'bg-blue-100 text-blue-700' :
+                                    'bg-gray-100 text-gray-700'
                                 }`}>
                                 {user.role === 'admin' ? 'Админ' :
                                     user.role === 'inspector' ? 'Инспектор' : user.role}
@@ -361,8 +378,8 @@ export default function DefectManagement() {
                     <button
                         onClick={() => setActiveTab('defects')}
                         className={`py-3 px-1 border-b-2 font-medium text-sm ${activeTab === 'defects'
-                                ? 'border-blue-500 text-blue-600'
-                                : 'border-transparent text-gray-500 hover:text-gray-700'
+                            ? 'border-blue-500 text-blue-600'
+                            : 'border-transparent text-gray-500 hover:text-gray-700'
                             }`}
                     >
                         <AlertTriangle className="w-4 h-4 inline mr-2" />
@@ -371,8 +388,8 @@ export default function DefectManagement() {
                     <button
                         onClick={() => setActiveTab('works')}
                         className={`py-3 px-1 border-b-2 font-medium text-sm ${activeTab === 'works'
-                                ? 'border-blue-500 text-blue-600'
-                                : 'border-transparent text-gray-500 hover:text-gray-700'
+                            ? 'border-blue-500 text-blue-600'
+                            : 'border-transparent text-gray-500 hover:text-gray-700'
                             }`}
                     >
                         <List className="w-4 h-4 inline mr-2" />
@@ -544,8 +561,8 @@ export default function DefectManagement() {
                                                 ))}
                                                 {canEdit && (
                                                     <label className={`flex items-center justify-center h-24 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${!hasAfterPhoto && works.some(w => w.status === 'in_progress')
-                                                            ? 'border-red-400 bg-red-50 hover:border-red-500'
-                                                            : 'border-gray-300 hover:border-green-500 hover:bg-green-50'
+                                                        ? 'border-red-400 bg-red-50 hover:border-red-500'
+                                                        : 'border-gray-300 hover:border-green-500 hover:bg-green-50'
                                                         }`}>
                                                         <input
                                                             type="file"
@@ -675,8 +692,8 @@ export default function DefectManagement() {
                                                             <button
                                                                 onClick={() => handleSubmitForApproval(work.id, hasAfterPhoto)}
                                                                 className={`flex items-center text-xs px-2 py-1 rounded ${hasAfterPhoto
-                                                                        ? 'bg-purple-600 text-white hover:bg-purple-700'
-                                                                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                                                    ? 'bg-purple-600 text-white hover:bg-purple-700'
+                                                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                                                     }`}
                                                                 title={hasAfterPhoto ? 'Отправить на проверку' : 'Сначала загрузите фото после ремонта'}
                                                             >
@@ -767,7 +784,11 @@ export default function DefectManagement() {
                     {/* Works table */}
                     <div className="divide-y divide-gray-100">
                         {sortedAllWorks.map((work) => (
-                            <div key={work.id} className="p-4 hover:bg-gray-50">
+                            <div
+                                key={work.id}
+                                className="p-4 hover:bg-gray-50 cursor-pointer"
+                                onClick={() => openWorkDetails(work)}
+                            >
                                 <div className="flex items-center justify-between">
                                     <div className="flex-1">
                                         <div className="flex items-center space-x-3">
@@ -795,28 +816,16 @@ export default function DefectManagement() {
                                                 <Clock className="w-3 h-3 mr-1" />
                                                 Создано: {work.created_at.split('T')[0]}
                                             </span>
+                                            <span className="text-blue-600">
+                                                Нажмите для просмотра деталей →
+                                            </span>
                                         </div>
                                     </div>
-                                    <div className="flex items-center space-x-2">
-                                        {isAdmin && work.status === 'pending_approval' && (
-                                            <>
-                                                <button
-                                                    onClick={() => handleApprove(work.id, true)}
-                                                    className="flex items-center text-xs px-3 py-1.5 bg-green-600 text-white rounded hover:bg-green-700"
-                                                >
-                                                    <CheckCircle className="w-3 h-3 mr-1" />
-                                                    Принять
-                                                </button>
-                                                <button
-                                                    onClick={() => handleApprove(work.id, false)}
-                                                    className="flex items-center text-xs px-3 py-1.5 bg-red-600 text-white rounded hover:bg-red-700"
-                                                >
-                                                    <XCircle className="w-3 h-3 mr-1" />
-                                                    Вернуть
-                                                </button>
-                                            </>
-                                        )}
-                                    </div>
+                                    {work.status === 'pending_approval' && (
+                                        <span className="text-xs px-2 py-1 bg-purple-100 text-purple-700 rounded animate-pulse">
+                                            Ожидает проверки
+                                        </span>
+                                    )}
                                 </div>
                             </div>
                         ))}
@@ -829,6 +838,162 @@ export default function DefectManagement() {
                     </div>
                 </div>
             )}
+
+            {/* Work Details Modal */}
+            {selectedWork && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+                        {/* Modal Header */}
+                        <div className="p-6 border-b border-gray-200 flex items-start justify-between">
+                            <div>
+                                <h2 className="text-xl font-bold text-gray-900">{selectedWork.title}</h2>
+                                <div className="flex items-center space-x-2 mt-2">
+                                    <span className={`text-xs px-2 py-0.5 rounded ${getPriorityColor(selectedWork.priority)}`}>
+                                        {selectedWork.priority === 'critical' ? 'Критический' :
+                                            selectedWork.priority === 'high' ? 'Высокий' :
+                                                selectedWork.priority === 'medium' ? 'Средний' : 'Низкий'}
+                                    </span>
+                                    <span className={`text-xs px-2 py-0.5 rounded ${getStatusColor(selectedWork.status)}`}>
+                                        {getStatusLabel(selectedWork.status)}
+                                    </span>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => setSelectedWork(null)}
+                                className="text-gray-400 hover:text-gray-600"
+                            >
+                                <X className="w-6 h-6" />
+                            </button>
+                        </div>
+
+                        {/* Modal Content */}
+                        <div className="p-6 space-y-6">
+                            {/* Work Info */}
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                                <div>
+                                    <span className="text-gray-500">Плановая дата:</span>
+                                    <p className="font-medium">{selectedWork.planned_date || '-'}</p>
+                                </div>
+                                <div>
+                                    <span className="text-gray-500">Создано:</span>
+                                    <p className="font-medium">{selectedWork.created_at.split('T')[0]}</p>
+                                </div>
+                                <div>
+                                    <span className="text-gray-500">Завершено:</span>
+                                    <p className="font-medium">{selectedWork.completed_date || '-'}</p>
+                                </div>
+                                <div>
+                                    <span className="text-gray-500">Инспекция ID:</span>
+                                    <p className="font-medium">#{selectedWork.inspection_id}</p>
+                                </div>
+                            </div>
+
+                            {selectedWork.description && (
+                                <div>
+                                    <h4 className="font-medium text-gray-900 mb-2">Описание работы:</h4>
+                                    <p className="text-gray-700 bg-gray-50 p-3 rounded-lg">{selectedWork.description}</p>
+                                </div>
+                            )}
+
+                            {selectedWork.notes && (
+                                <div>
+                                    <h4 className="font-medium text-gray-900 mb-2">Заметки:</h4>
+                                    <p className="text-gray-700 bg-gray-50 p-3 rounded-lg whitespace-pre-line">{selectedWork.notes}</p>
+                                </div>
+                            )}
+
+                            {/* Photos Section */}
+                            <div>
+                                <h4 className="font-medium text-gray-900 mb-4 flex items-center">
+                                    <Camera className="w-5 h-5 mr-2" />
+                                    Фотофиксация
+                                </h4>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* Before Photos */}
+                                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                                        <h5 className="font-medium text-red-800 mb-3">📷 До ремонта</h5>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            {workMedia.filter(m => m.is_before).map((m) => (
+                                                <img
+                                                    key={m.id}
+                                                    src={`${API_URL}/api/media/file/${m.id}`}
+                                                    alt="До ремонта"
+                                                    className="w-full h-32 object-cover rounded-lg border-2 border-red-300"
+                                                />
+                                            ))}
+                                            {workMedia.filter(m => m.is_before).length === 0 && (
+                                                <p className="col-span-2 text-sm text-red-600 italic">Фото не загружены</p>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* After Photos */}
+                                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                                        <h5 className="font-medium text-green-800 mb-3">📷 После ремонта</h5>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            {workMedia.filter(m => !m.is_before).map((m) => (
+                                                <img
+                                                    key={m.id}
+                                                    src={`${API_URL}/api/media/file/${m.id}`}
+                                                    alt="После ремонта"
+                                                    className="w-full h-32 object-cover rounded-lg border-2 border-green-300"
+                                                />
+                                            ))}
+                                            {workMedia.filter(m => !m.is_before).length === 0 && (
+                                                <p className="col-span-2 text-sm text-green-600 italic">Фото не загружены</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Modal Footer - Approval Buttons */}
+                        {isAdmin && selectedWork.status === 'pending_approval' && (
+                            <div className="p-6 border-t border-gray-200 bg-gray-50 flex items-center justify-between">
+                                <p className="text-sm text-gray-600">
+                                    Проверьте фотографии до и после ремонта перед принятием решения
+                                </p>
+                                <div className="flex space-x-3">
+                                    <button
+                                        onClick={() => {
+                                            handleApprove(selectedWork.id, false);
+                                            setSelectedWork(null);
+                                        }}
+                                        className="flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                                    >
+                                        <XCircle className="w-4 h-4 mr-2" />
+                                        Вернуть на доработку
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            handleApprove(selectedWork.id, true);
+                                            setSelectedWork(null);
+                                        }}
+                                        className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                                    >
+                                        <CheckCircle className="w-4 h-4 mr-2" />
+                                        Принять работу
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Close button for non-pending works */}
+                        {selectedWork.status !== 'pending_approval' && (
+                            <div className="p-6 border-t border-gray-200 bg-gray-50 flex justify-end">
+                                <button
+                                    onClick={() => setSelectedWork(null)}
+                                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+                                >
+                                    Закрыть
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
+
