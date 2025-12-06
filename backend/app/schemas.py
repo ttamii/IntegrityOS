@@ -74,6 +74,11 @@ class RoleUpdate(BaseModel):
     role: str
 
 
+class PasswordChange(BaseModel):
+    current_password: str
+    new_password: str
+
+
 # Pipeline Schemas
 class PipelineBase(BaseModel):
     pipeline_id: str

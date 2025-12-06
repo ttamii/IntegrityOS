@@ -209,6 +209,31 @@ async def update_current_user_profile(
     return current_user
 
 
+@router.put("/me/password")
+async def change_password(
+    password_data: schemas.PasswordChange,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Change current user's password."""
+    if not verify_password(password_data.current_password, current_user.password_hash):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Current password is incorrect"
+        )
+    
+    if len(password_data.new_password) < 6:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="New password must be at least 6 characters"
+        )
+    
+    current_user.password_hash = get_password_hash(password_data.new_password)
+    db.commit()
+    
+    return {"message": "Password changed successfully"}
+
+
 # Admin-only endpoints
 @router.get("/users", response_model=List[schemas.UserResponse])
 async def get_all_users(

@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Sidebar from './components/Sidebar';
 import Dashboard from './pages/Dashboard';
@@ -9,6 +9,7 @@ import Reports from './pages/Reports';
 import About from './pages/About';
 import Login from './pages/Login';
 import DefectManagement from './pages/DefectManagement';
+import Profile from './pages/Profile';
 import { LogOut } from 'lucide-react';
 
 // Protected Route wrapper
@@ -33,6 +34,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 // Main Layout with Sidebar
 function MainLayout() {
     const { user, logout } = useAuth();
+    const navigate = useNavigate();
     const userRole = user?.role || 'guest';
 
     const getRoleName = (role: string) => {
@@ -64,21 +66,27 @@ function MainLayout() {
                             </p>
                         </div>
                         <div className="flex items-center space-x-4">
-                            {/* User Profile */}
+                            {/* User Profile - Clickable */}
                             <div className="flex items-center space-x-3">
-                                <div className="text-right">
-                                    <p className="text-sm font-medium text-gray-900">
-                                        {user?.full_name || user?.username}
-                                    </p>
-                                    <p className="text-xs text-gray-500">
-                                        {getRoleName(userRole)}
-                                    </p>
-                                </div>
-                                <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-                                    <span className="text-white font-semibold">
-                                        {(user?.username || 'U')[0].toUpperCase()}
-                                    </span>
-                                </div>
+                                <button
+                                    onClick={() => navigate('/profile')}
+                                    className="flex items-center space-x-3 hover:bg-gray-50 rounded-lg px-3 py-2 transition-colors"
+                                    title="Открыть профиль"
+                                >
+                                    <div className="text-right">
+                                        <p className="text-sm font-medium text-gray-900">
+                                            {user?.full_name || user?.username}
+                                        </p>
+                                        <p className="text-xs text-gray-500">
+                                            {getRoleName(userRole)}
+                                        </p>
+                                    </div>
+                                    <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+                                        <span className="text-white font-semibold">
+                                            {(user?.username || 'U')[0].toUpperCase()}
+                                        </span>
+                                    </div>
+                                </button>
                                 <button
                                     onClick={logout}
                                     className="ml-2 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
@@ -100,6 +108,7 @@ function MainLayout() {
                         <Route path="/defects" element={<DefectManagement />} />
                         <Route path="/import" element={<ImportData />} />
                         <Route path="/reports" element={<Reports />} />
+                        <Route path="/profile" element={<Profile />} />
                         <Route path="/about" element={<About />} />
                     </Routes>
                 </main>
