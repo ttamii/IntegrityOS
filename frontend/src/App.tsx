@@ -12,6 +12,7 @@ import Login from './pages/Login';
 import DefectManagement from './pages/DefectManagement';
 import Profile from './pages/Profile';
 import Users from './pages/Users';
+import Pipeline3D from './pages/Pipeline3D';
 import NotificationBell from './components/NotificationBell';
 import { LogOut, Menu } from 'lucide-react';
 
@@ -128,6 +129,7 @@ function MainLayout() {
                         <Route path="/defects" element={<DefectManagement />} />
                         <Route path="/import" element={<ImportData />} />
                         <Route path="/reports" element={<Reports />} />
+                        <Route path="/3d" element={<Pipeline3D />} />
                         <Route path="/profile" element={<Profile />} />
                         <Route path="/users" element={<Users />} />
                         <Route path="/about" element={<About />} />

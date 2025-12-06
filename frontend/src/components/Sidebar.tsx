@@ -11,7 +11,8 @@ import {
     ChevronLeft,
     ChevronRight,
     AlertTriangle,
-    X
+    X,
+    Box
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
@@ -49,6 +50,7 @@ export default function Sidebar({ userRole = 'guest', isOpen = true, onClose }: 
         { path: '/defects', icon: AlertTriangle, label: 'Дефекты', roles: ['admin', 'inspector'] },
         { path: '/import', icon: Upload, label: 'Импорт данных', roles: ['admin', 'inspector'] },
         { path: '/reports', icon: BarChart3, label: 'Отчёты', roles: ['admin', 'inspector', 'analyst'] },
+        { path: '/3d', icon: Box, label: '3D Визуализация', roles: ['admin', 'inspector', 'analyst', 'guest'] },
         { path: '/users', icon: Users, label: 'Пользователи', roles: ['admin'] },
     ];
 
