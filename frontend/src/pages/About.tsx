@@ -5,13 +5,13 @@ export default function About() {
         <div className="space-y-6 animate-fade-in">
             {/* Header */}
             <div>
-                <h1 className="text-3xl font-bold text-white mb-2">О проекте IntegrityOS</h1>
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">О проекте IntegrityOS</h1>
                 <p className="text-gray-600">Платформа анализа трубопроводов с ML-классификацией</p>
             </div>
 
             {/* Project Description */}
             <div className="bg-white rounded-lg p-6 card-hover">
-                <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
                     <Info className="h-5 w-5 mr-2 text-primary-500" />
                     Описание проекта
                 </h2>
@@ -31,7 +31,7 @@ export default function About() {
 
             {/* Tech Stack */}
             <div className="bg-white rounded-lg p-6 card-hover">
-                <h2 className="text-xl font-semibold text-white mb-4">Технологический стек</h2>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">Технологический стек</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <h3 className="text-lg font-medium text-primary-400 mb-3">Backend</h3>
@@ -58,7 +58,7 @@ export default function About() {
 
             {/* Features */}
             <div className="bg-white rounded-lg p-6 card-hover">
-                <h2 className="text-xl font-semibold text-white mb-4">Основной функционал</h2>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">Основной функционал</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div className="bg-white rounded-lg p-4">
                         <h3 className="font-medium text-gray-900 mb-2">Аналитический дашборд</h3>
@@ -73,13 +73,13 @@ export default function About() {
                         </p>
                     </div>
                     <div className="bg-white rounded-lg p-4">
-                        <h3 className="font-medium text-white mb-2">🤖 ML-классификация</h3>
+                        <h3 className="font-medium text-gray-900 mb-2">🤖 ML-классификация</h3>
                         <p className="text-sm text-gray-600">
                             RandomForest модель с точностью 94.74% для автоматической оценки рисков
                         </p>
                     </div>
                     <div className="bg-white rounded-lg p-4">
-                        <h3 className="font-medium text-white mb-2">📥 Импорт данных</h3>
+                        <h3 className="font-medium text-gray-900 mb-2">📥 Импорт данных</h3>
                         <p className="text-sm text-gray-600">
                             Загрузка CSV/XLSX файлов с валидацией и обработкой ошибок
                         </p>
@@ -101,7 +101,7 @@ export default function About() {
 
             {/* ML Model */}
             <div className="bg-white rounded-lg p-6 card-hover">
-                <h2 className="text-xl font-semibold text-white mb-4">ML-модель классификации рисков</h2>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">ML-модель классификации рисков</h2>
                 <div className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="bg-white rounded-lg p-4 text-center">
@@ -127,7 +127,7 @@ export default function About() {
 
             {/* Team */}
             <div className="bg-white rounded-lg p-6 card-hover">
-                <h2 className="text-xl font-semibold text-white mb-4">Команда</h2>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">Команда</h2>
                 <div className="text-gray-700">
                     <p className="mb-4">
                         Проект разработан для хакатона IntegrityOS в рамках цифровизации
@@ -152,7 +152,7 @@ export default function About() {
 
             {/* Stats */}
             <div className="bg-white rounded-lg p-6 card-hover">
-                <h2 className="text-xl font-semibold text-white mb-4">Статистика проекта</h2>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">Статистика проекта</h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="text-center">
                         <div className="text-2xl font-bold text-gray-900">5000+</div>

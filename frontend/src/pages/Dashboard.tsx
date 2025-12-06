@@ -111,7 +111,7 @@ export default function Dashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Defects by Method */}
                 <div className="bg-white rounded-lg p-6 card-hover">
-                    <h2 className="text-xl font-semibold text-white mb-4">Дефекты по методам контроля</h2>
+                    <h2 className="text-xl font-semibold text-gray-900 mb-4">Дефекты по методам контроля</h2>
                     <ResponsiveContainer width="100%" height={300}>
                         <BarChart data={methodsData}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
@@ -192,7 +192,7 @@ export default function Dashboard() {
             {/* Top Risks Table */}
             {stats.top_risks.length > 0 && (
                 <div className="bg-white rounded-lg p-6 card-hover">
-                    <h2 className="text-xl font-semibold text-white mb-4">Топ-5 критичных объектов</h2>
+                    <h2 className="text-xl font-semibold text-gray-900 mb-4">Топ-5 критичных объектов</h2>
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead>
@@ -248,7 +248,7 @@ function StatCard({ icon, label, value, color }: StatCardProps) {
                     <p className="text-sm font-medium text-gray-600 mb-1">{label}</p>
                     <p className="text-3xl font-bold text-gray-900">{value}</p>
                 </div>
-                <div className={`${color} p-4 rounded-xl text-white shadow-sm`}>
+                <div className={`${color} p-4 rounded-xl text-gray-900 shadow-sm`}>
                     {icon}
                 </div>
             </div>

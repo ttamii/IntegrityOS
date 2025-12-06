@@ -153,7 +153,7 @@ export default function MapView() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold text-white mb-2">Карта объектов</h1>
+                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Карта объектов</h1>
                     <p className="text-gray-600">Визуализация трубопроводов и дефектов</p>
                 </div>
                 <button
@@ -176,7 +176,7 @@ export default function MapView() {
                             <select
                                 value={filters.risk_level || ''}
                                 onChange={(e) => setFilters({ ...filters, risk_level: e.target.value as RiskLevel || undefined })}
-                                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500"
                             >
                                 <option value="">Все</option>
                                 <option value="normal">Низкий</option>
@@ -192,7 +192,7 @@ export default function MapView() {
                             <select
                                 value={filters.method || ''}
                                 onChange={(e) => setFilters({ ...filters, method: e.target.value as any || undefined })}
-                                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500"
                             >
                                 <option value="">Все методы</option>
                                 <option value="VIK">VIK</option>
@@ -217,7 +217,7 @@ export default function MapView() {
                                 type="date"
                                 value={filters.date_from || ''}
                                 onChange={(e) => setFilters({ ...filters, date_from: e.target.value })}
-                                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500"
                             />
                         </div>
 
@@ -229,7 +229,7 @@ export default function MapView() {
                                 type="date"
                                 value={filters.date_to || ''}
                                 onChange={(e) => setFilters({ ...filters, date_to: e.target.value })}
-                                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500"
                             />
                         </div>
                     </div>
@@ -258,14 +258,14 @@ export default function MapView() {
                                             placeholder="От"
                                             value={paramRanges.depthMin}
                                             onChange={(e) => setParamRanges({ ...paramRanges, depthMin: e.target.value })}
-                                            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
                                         />
                                         <input
                                             type="number"
                                             placeholder="До"
                                             value={paramRanges.depthMax}
                                             onChange={(e) => setParamRanges({ ...paramRanges, depthMax: e.target.value })}
-                                            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
                                         />
                                     </div>
                                 </div>
@@ -281,14 +281,14 @@ export default function MapView() {
                                             placeholder="От"
                                             value={paramRanges.lengthMin}
                                             onChange={(e) => setParamRanges({ ...paramRanges, lengthMin: e.target.value })}
-                                            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
                                         />
                                         <input
                                             type="number"
                                             placeholder="До"
                                             value={paramRanges.lengthMax}
                                             onChange={(e) => setParamRanges({ ...paramRanges, lengthMax: e.target.value })}
-                                            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
                                         />
                                     </div>
                                 </div>
@@ -304,14 +304,14 @@ export default function MapView() {
                                             placeholder="От"
                                             value={paramRanges.widthMin}
                                             onChange={(e) => setParamRanges({ ...paramRanges, widthMin: e.target.value })}
-                                            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
                                         />
                                         <input
                                             type="number"
                                             placeholder="До"
                                             value={paramRanges.widthMax}
                                             onChange={(e) => setParamRanges({ ...paramRanges, widthMax: e.target.value })}
-                                            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
                                         />
                                     </div>
                                 </div>
@@ -332,7 +332,7 @@ export default function MapView() {
                                     widthMax: ''
                                 });
                             }}
-                            className="px-4 py-2 bg-white text-white rounded-lg hover:bg-gray-100 transition-colors"
+                            className="px-4 py-2 bg-white text-gray-900 rounded-lg hover:bg-gray-100 transition-colors"
                         >
                             Сбросить фильтры
                         </button>
@@ -405,7 +405,7 @@ export default function MapView() {
                                                 <p>
                                                     <strong>Уровень риска:</strong>{' '}
                                                     <span
-                                                        className="px-2 py-1 rounded text-white text-xs font-medium"
+                                                        className="px-2 py-1 rounded text-gray-900 text-xs font-medium"
                                                         style={{ backgroundColor: RISK_COLORS[riskLevel] }}
                                                     >
                                                         {riskLevel.toUpperCase()}
@@ -429,7 +429,7 @@ export default function MapView() {
 
             {/* Legend */}
             <div className="bg-white rounded-lg p-4">
-                <h3 className="text-white font-semibold mb-3">Легенда</h3>
+                <h3 className="text-gray-900 font-semibold mb-3">Легенда</h3>
                 <div className="flex flex-wrap gap-4">
                     <div className="flex items-center">
                         <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: RISK_COLORS.normal }}></div>
