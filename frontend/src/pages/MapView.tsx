@@ -107,10 +107,20 @@ export default function MapView() {
     };
 
     const filterObjectsByParams = (objs: PipelineObject[]): PipelineObject[] => {
-        const hasRanges = Object.values(paramRanges).some(v => v !== '');
-        if (!hasRanges) return objs;
+        // First filter by risk level if selected
+        let filtered = objs;
+        if (filters.risk_level) {
+            filtered = filtered.filter(obj => {
+                const objRiskLevel = getRiskLevel(obj);
+                return objRiskLevel === filters.risk_level;
+            });
+        }
 
-        return objs.filter(obj => {
+        // Then filter by parameter ranges if set
+        const hasRanges = Object.values(paramRanges).some(v => v !== '');
+        if (!hasRanges) return filtered;
+
+        return filtered.filter(obj => {
             if (!obj.inspections || obj.inspections.length === 0) return false;
 
             return obj.inspections.some(insp => {
