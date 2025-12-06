@@ -77,14 +77,9 @@ export default function Dashboard() {
         : [];
 
     return (
-        <div className="space-y-6 animate-fade-in">
-            {/* Header */}
-            <div>
-                <h1 className="text-3xl font-bold text-white mb-2">Аналитический дашборд</h1>
-                <p className="text-slate-400">Общая статистика по обследованиям трубопроводов</p>
-            </div>
-
+        <div className="space-y-6">
             {/* Stats Cards */}
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <StatCard
                     icon={<Activity className="h-8 w-8" />}
