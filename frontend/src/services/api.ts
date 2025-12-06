@@ -89,4 +89,60 @@ export const reportsAPI = {
     },
 };
 
+// Auth API
+export const authAPI = {
+    login: async (username: string, password: string) => {
+        const formData = new FormData();
+        formData.append('username', username);
+        formData.append('password', password);
+
+        const response = await api.post<{ access_token: string; token_type: string }>(
+            '/api/auth/login',
+            formData,
+            { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+        );
+        return response.data;
+    },
+
+    register: async (userData: {
+        username: string;
+        email: string;
+        password: string;
+        full_name?: string;
+    }) => {
+        const response = await api.post('/api/auth/register', userData);
+        return response.data;
+    },
+
+    getMe: async (token: string) => {
+        const response = await api.get('/api/auth/me', {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        return response.data;
+    },
+
+    getUsers: async (token: string) => {
+        const response = await api.get('/api/auth/users', {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        return response.data;
+    },
+
+    updateUserRole: async (token: string, userId: number, role: string) => {
+        const response = await api.put(
+            `/api/auth/users/${userId}/role`,
+            { role },
+            { headers: { Authorization: `Bearer ${token}` } }
+        );
+        return response.data;
+    },
+
+    deleteUser: async (token: string, userId: number) => {
+        const response = await api.delete(`/api/auth/users/${userId}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        return response.data;
+    },
+};
+
 export default api;

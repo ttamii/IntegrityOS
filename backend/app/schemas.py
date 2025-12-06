@@ -37,6 +37,43 @@ class RiskLevel(str, Enum):
     HIGH = "high"
 
 
+class UserRole(str, Enum):
+    ADMIN = "admin"
+    INSPECTOR = "inspector"
+    ANALYST = "analyst"
+    GUEST = "guest"
+
+
+# User Schemas
+class UserBase(BaseModel):
+    username: str
+    email: str
+    full_name: Optional[str] = None
+
+
+class UserCreate(UserBase):
+    password: str
+
+
+class UserUpdate(BaseModel):
+    email: Optional[str] = None
+    full_name: Optional[str] = None
+
+
+class UserResponse(UserBase):
+    id: int
+    role: UserRole
+    is_active: bool
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class RoleUpdate(BaseModel):
+    role: str
+
+
 # Pipeline Schemas
 class PipelineBase(BaseModel):
     pipeline_id: str
