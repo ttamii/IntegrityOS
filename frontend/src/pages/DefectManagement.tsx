@@ -274,6 +274,30 @@ export default function DefectManagement() {
         }
     };
 
+    const handleDeletePhoto = async (mediaId: number) => {
+        if (!token || !selectedDefect) return;
+
+        if (!confirm('Вы уверены, что хотите удалить это фото?')) return;
+
+        try {
+            const response = await fetch(`${API_URL}/api/media/${mediaId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                fetchMedia(selectedDefect.id);
+            } else {
+                const error = await response.json();
+                alert(error.detail || 'Ошибка при удалении фото');
+            }
+        } catch (error) {
+            console.error('Error deleting photo:', error);
+        }
+    };
+
     const getPriorityColor = (priority: string) => {
         const colors: Record<string, string> = {
             low: 'bg-gray-100 text-gray-700',
@@ -515,6 +539,15 @@ export default function DefectManagement() {
                                                             alt={m.description || 'Фото дефекта'}
                                                             className="w-full h-24 object-cover rounded-lg border border-gray-200"
                                                         />
+                                                        {canEdit && (
+                                                            <button
+                                                                onClick={() => handleDeletePhoto(m.id)}
+                                                                className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                                                                title="Удалить фото"
+                                                            >
+                                                                <X className="w-3 h-3" />
+                                                            </button>
+                                                        )}
                                                     </div>
                                                 ))}
                                                 {canEdit && (
@@ -557,7 +590,16 @@ export default function DefectManagement() {
                                                             alt={m.description || 'Фото после ремонта'}
                                                             className="w-full h-24 object-cover rounded-lg border-2 border-green-500"
                                                         />
-                                                        <CheckCircle className="absolute top-1 right-1 w-4 h-4 text-green-600" />
+                                                        <CheckCircle className="absolute top-1 left-1 w-4 h-4 text-green-600" />
+                                                        {canEdit && (
+                                                            <button
+                                                                onClick={() => handleDeletePhoto(m.id)}
+                                                                className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                                                                title="Удалить фото"
+                                                            >
+                                                                <X className="w-3 h-3" />
+                                                            </button>
+                                                        )}
                                                     </div>
                                                 ))}
                                                 {canEdit && (
