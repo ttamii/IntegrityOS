@@ -10,7 +10,7 @@ export default function ObjectsList() {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterType, setFilterType] = useState('');
-    const [sortBy, setSortBy] = useState<'none' | 'depth_asc' | 'depth_desc'>('none');
+    const [sortBy, setSortBy] = useState<'none' | 'date_asc'>('none');
     const [exporting, setExporting] = useState(false);
 
     useEffect(() => {
@@ -228,19 +228,18 @@ export default function ObjectsList() {
                                         onChange={(e) => setSortBy(e.target.value as any)}
                                         className="px-3 py-1 bg-white border border-gray-300 rounded text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
                                     >
-                                        <option value="none">По дате</option>
-                                        <option value="depth_asc">По глубине ↑</option>
-                                        <option value="depth_desc">По глубине ↓</option>
+                                        <option value="none">Сначала новые</option>
+                                        <option value="date_asc">Сначала старые</option>
                                     </select>
                                 </div>
                                 <div className="space-y-3 max-h-[400px] overflow-y-auto">
                                     {inspections.length > 0 ? (
                                         (() => {
                                             let sorted = [...inspections];
-                                            if (sortBy === 'depth_asc') {
-                                                sorted.sort((a, b) => (a.param1 || 0) - (b.param1 || 0));
-                                            } else if (sortBy === 'depth_desc') {
-                                                sorted.sort((a, b) => (b.param1 || 0) - (a.param1 || 0));
+                                            if (sortBy === 'date_asc') {
+                                                sorted.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+                                            } else {
+                                                sorted.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
                                             }
                                             return sorted;
                                         })().map((insp) => (
