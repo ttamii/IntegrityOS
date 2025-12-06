@@ -57,6 +57,9 @@ class User(Base):
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
+    # Relationships
+    notifications = relationship("Notification", back_populates="user")
+
 
 class Pipeline(Base):
     __tablename__ = "pipelines"
@@ -171,3 +174,28 @@ class RepairWork(Base):
     inspection = relationship("Inspection", back_populates="repair_works")
     assignee = relationship("User", foreign_keys=[assigned_to])
     creator = relationship("User", foreign_keys=[created_by])
+
+
+class NotificationType(str, enum.Enum):
+    WORK_SUBMITTED = "work_submitted"  # Inspector submitted work for approval
+    WORK_APPROVED = "work_approved"    # Admin approved work
+    WORK_REJECTED = "work_rejected"    # Admin rejected work
+    WORK_ASSIGNED = "work_assigned"    # Work assigned to user
+    SYSTEM = "system"                  # System notification
+
+
+class Notification(Base):
+    __tablename__ = "notifications"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    type = Column(Enum(NotificationType), default=NotificationType.SYSTEM)
+    title = Column(String(255), nullable=False)
+    message = Column(Text)
+    is_read = Column(Boolean, default=False)
+    work_id = Column(Integer, ForeignKey("repair_works.id"), nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    # Relationships
+    user = relationship("User", back_populates="notifications")
+    work = relationship("RepairWork")

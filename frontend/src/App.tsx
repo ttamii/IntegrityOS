@@ -11,6 +11,7 @@ import Login from './pages/Login';
 import DefectManagement from './pages/DefectManagement';
 import Profile from './pages/Profile';
 import Users from './pages/Users';
+import NotificationBell from './components/NotificationBell';
 import { LogOut } from 'lucide-react';
 
 // Protected Route wrapper
@@ -67,6 +68,9 @@ function MainLayout() {
                             </p>
                         </div>
                         <div className="flex items-center space-x-4">
+                            {/* Notifications */}
+                            <NotificationBell />
+
                             {/* User Profile - Clickable */}
                             <div className="flex items-center space-x-3">
                                 <button

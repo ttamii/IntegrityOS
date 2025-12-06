@@ -79,6 +79,29 @@ class PasswordChange(BaseModel):
     new_password: str
 
 
+# Notification Schemas
+class NotificationType(str, Enum):
+    WORK_SUBMITTED = "work_submitted"
+    WORK_APPROVED = "work_approved"
+    WORK_REJECTED = "work_rejected"
+    WORK_ASSIGNED = "work_assigned"
+    SYSTEM = "system"
+
+
+class NotificationResponse(BaseModel):
+    id: int
+    user_id: int
+    type: NotificationType
+    title: str
+    message: Optional[str]
+    is_read: bool
+    work_id: Optional[int]
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
 # Pipeline Schemas
 class PipelineBase(BaseModel):
     pipeline_id: str

@@ -165,6 +165,22 @@ async def submit_for_approval(
         work.status = models.WorkStatus.PENDING_APPROVAL
         if notes:
             work.notes = (work.notes or "") + f"\n\nОтправлено на проверку: {notes}"
+        
+        # Notify all admins about pending approval
+        admins = db.query(models.User).filter(
+            models.User.role == models.UserRole.ADMIN,
+            models.User.is_active == True
+        ).all()
+        
+        for admin in admins:
+            notification = models.Notification(
+                user_id=admin.id,
+                type=models.NotificationType.WORK_SUBMITTED,
+                title="Работа ожидает проверки",
+                message=f"Инспектор {current_user.full_name or current_user.username} отправил работу '{work.title}' на проверку",
+                work_id=work.id
+            )
+            db.add(notification)
     
     db.commit()
     db.refresh(work)
@@ -188,18 +204,42 @@ async def approve_work(
     if work.status != models.WorkStatus.PENDING_APPROVAL:
         raise HTTPException(status_code=400, detail="Work is not pending approval")
     
+    # Find the inspector who created/submitted this work
+    inspector_id = work.created_by
+    
     if approved:
         work.status = models.WorkStatus.COMPLETED
         work.completed_date = date.today()
         if notes:
             work.notes = (work.notes or "") + f"\n\nПодтверждено администратором: {notes}"
+        
+        # Notify inspector about approval
+        notification = models.Notification(
+            user_id=inspector_id,
+            type=models.NotificationType.WORK_APPROVED,
+            title="Работа принята",
+            message=f"Ваша работа '{work.title}' была принята администратором",
+            work_id=work.id
+        )
+        db.add(notification)
     else:
         work.status = models.WorkStatus.IN_PROGRESS
         if notes:
             work.notes = (work.notes or "") + f"\n\nОтклонено, требуется доработка: {notes}"
+        
+        # Notify inspector about rejection
+        notification = models.Notification(
+            user_id=inspector_id,
+            type=models.NotificationType.WORK_REJECTED,
+            title="Работа возвращена на доработку",
+            message=f"Работа '{work.title}' требует доработки" + (f": {notes}" if notes else ""),
+            work_id=work.id
+        )
+        db.add(notification)
     
     db.commit()
     db.refresh(work)
     
     return work
+
 
