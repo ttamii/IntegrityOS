@@ -139,14 +139,14 @@ export default function ObjectsList() {
                                 <div
                                     key={obj.object_id}
                                     onClick={() => loadObjectDetails(obj.object_id)}
-                                    className={`bg-white rounded-lg p-4 cursor-pointer transition-all ${selectedObject?.object_id === obj.object_id
-                                        ? 'ring-2 ring-primary-500 bg-slate-700'
-                                        : 'hover:bg-slate-700'
+                                    className={`bg-white rounded-lg p-4 cursor-pointer transition-all border border-gray-200 ${selectedObject?.object_id === obj.object_id
+                                        ? 'ring-2 ring-blue-500 bg-blue-50'
+                                        : 'hover:bg-gray-50'
                                         }`}
                                 >
                                     <div className="flex items-start justify-between">
                                         <div>
-                                            <h3 className="text-white font-semibold">{obj.object_name}</h3>
+                                            <h3 className="text-gray-900 font-semibold">{obj.object_name}</h3>
                                             <p className="text-gray-600 text-sm mt-1">
                                                 ID: {obj.object_id} • {obj.pipeline_id}
                                             </p>

@@ -128,7 +128,7 @@ export default function Dashboard() {
 
                 {/* Risk Distribution */}
                 <div className="bg-white rounded-lg p-6 card-hover">
-                    <h2 className="text-xl font-semibold text-white mb-4">Распределение по уровням риска</h2>
+                    <h2 className="text-xl font-semibold text-gray-900 mb-4">Распределение по уровням риска</h2>
                     <ResponsiveContainer width="100%" height={300}>
                         <PieChart>
                             <Pie
@@ -154,7 +154,7 @@ export default function Dashboard() {
 
                 {/* Inspections Timeline */}
                 <div className="bg-white rounded-lg p-6 card-hover">
-                    <h2 className="text-xl font-semibold text-white mb-4">Динамика обследований по годам</h2>
+                    <h2 className="text-xl font-semibold text-gray-900 mb-4">Динамика обследований по годам</h2>
                     <ResponsiveContainer width="100%" height={300}>
                         <LineChart data={yearsData}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
@@ -172,7 +172,7 @@ export default function Dashboard() {
 
                 {/* Defects Timeline */}
                 <div className="bg-white rounded-lg p-6 card-hover">
-                    <h2 className="text-xl font-semibold text-white mb-4">Динамика дефектов по годам</h2>
+                    <h2 className="text-xl font-semibold text-gray-900 mb-4">Динамика дефектов по годам</h2>
                     <ResponsiveContainer width="100%" height={300}>
                         <LineChart data={defectsYearsData}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
