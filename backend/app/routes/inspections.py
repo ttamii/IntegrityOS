@@ -2,8 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import date
-from app import crud, schemas
+from app import crud, schemas, models
 from app.database import get_db
+from app.routes.auth import require_role
 
 router = APIRouter()
 
@@ -47,8 +48,12 @@ def get_inspection(diag_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/", response_model=schemas.InspectionResponse)
-def create_inspection(inspection: schemas.InspectionCreate, db: Session = Depends(get_db)):
-    """Create a new inspection"""
+async def create_inspection(
+    inspection: schemas.InspectionCreate,
+    current_user: models.User = Depends(require_role(["admin", "inspector"])),
+    db: Session = Depends(get_db)
+):
+    """Create a new inspection (admin/inspector only)"""
     # Check if diag_id already exists
     existing = crud.get_inspection(db, diag_id=inspection.diag_id)
     if existing:

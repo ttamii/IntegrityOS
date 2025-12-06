@@ -34,6 +34,23 @@ export const objectsAPI = {
         });
         return response.data;
     },
+
+    create: async (data: {
+        object_id: number;
+        object_name: string;
+        object_type: string;
+        pipeline_id: string;
+        lat: number;
+        lon: number;
+        year?: number;
+        material?: string;
+    }) => {
+        const token = localStorage.getItem('token');
+        const response = await api.post('/api/objects/', data, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        return response.data;
+    },
 };
 
 // Inspections API
@@ -45,6 +62,27 @@ export const inspectionsAPI = {
 
     getById: async (diagId: number) => {
         const response = await api.get<Inspection>(`/api/inspections/${diagId}`);
+        return response.data;
+    },
+
+    create: async (data: {
+        diag_id: number;
+        object_id: number;
+        method: string;
+        date: string;
+        temperature?: number;
+        humidity?: number;
+        defect_found?: boolean;
+        defect_description?: string;
+        quality_grade?: string;
+        param1?: number;
+        param2?: number;
+        param3?: number;
+    }) => {
+        const token = localStorage.getItem('token');
+        const response = await api.post('/api/inspections/', data, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
         return response.data;
     },
 };

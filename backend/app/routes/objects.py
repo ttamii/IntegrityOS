@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from typing import List, Optional
-from app import crud, schemas
+from app import crud, schemas, models
 from app.database import get_db
+from app.routes.auth import get_current_user, require_role
 
 router = APIRouter()
 
@@ -36,8 +37,12 @@ def get_object(object_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/", response_model=schemas.ObjectResponse)
-def create_object(obj: schemas.ObjectCreate, db: Session = Depends(get_db)):
-    """Create a new object"""
+async def create_object(
+    obj: schemas.ObjectCreate,
+    current_user: models.User = Depends(require_role(["admin", "inspector"])),
+    db: Session = Depends(get_db)
+):
+    """Create a new object (admin/inspector only)"""
     # Check if object_id already exists
     existing = crud.get_object(db, object_id=obj.object_id)
     if existing:
