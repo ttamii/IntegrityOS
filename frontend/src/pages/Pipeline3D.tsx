@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Text, Html, Environment } from '@react-three/drei';
+import { OrbitControls, Html, Environment } from '@react-three/drei';
 import { useAuth } from '../context/AuthContext';
-import { Box3D, RotateCcw, ZoomIn, AlertTriangle } from 'lucide-react';
+import { Box, RotateCcw, ZoomIn, AlertTriangle } from 'lucide-react';
 import * as THREE from 'three';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -235,7 +235,7 @@ export default function Pipeline3D() {
             <div className="absolute top-0 left-0 right-0 z-10 bg-white bg-opacity-90 backdrop-blur-sm border-b border-gray-200 px-6 py-4">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                        <Box3D className="w-6 h-6 text-blue-600" />
+                        <Box className="w-6 h-6 text-blue-600" />
                         <h1 className="text-xl font-bold text-gray-900">3D Визуализация трубопровода</h1>
                     </div>
                     <div className="flex items-center space-x-4">
@@ -326,9 +326,9 @@ export default function Pipeline3D() {
                         <div className="flex justify-between">
                             <span className="text-gray-500">Уровень риска:</span>
                             <span className={`font-medium px-2 py-0.5 rounded ${selectedSegment.riskLevel === 'critical' ? 'bg-red-100 text-red-700' :
-                                    selectedSegment.riskLevel === 'high' ? 'bg-orange-100 text-orange-700' :
-                                        selectedSegment.riskLevel === 'medium' ? 'bg-yellow-100 text-yellow-700' :
-                                            'bg-green-100 text-green-700'
+                                selectedSegment.riskLevel === 'high' ? 'bg-orange-100 text-orange-700' :
+                                    selectedSegment.riskLevel === 'medium' ? 'bg-yellow-100 text-yellow-700' :
+                                        'bg-green-100 text-green-700'
                                 }`}>
                                 {selectedSegment.riskLevel === 'critical' ? 'Критический' :
                                     selectedSegment.riskLevel === 'high' ? 'Высокий' :
