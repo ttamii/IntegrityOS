@@ -154,7 +154,7 @@ export default function MapView() {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-bold text-white mb-2">Карта объектов</h1>
-                    <p className="text-slate-400">Визуализация трубопроводов и дефектов</p>
+                    <p className="text-gray-600">Визуализация трубопроводов и дефектов</p>
                 </div>
                 <button
                     onClick={() => setShowFilters(!showFilters)}
@@ -167,16 +167,16 @@ export default function MapView() {
 
             {/* Filters Panel */}
             {showFilters && (
-                <div className="bg-slate-800 rounded-lg p-6 card-hover">
+                <div className="bg-white rounded-lg p-6 card-hover">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Уровень риска
                             </label>
                             <select
                                 value={filters.risk_level || ''}
                                 onChange={(e) => setFilters({ ...filters, risk_level: e.target.value as RiskLevel || undefined })}
-                                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                className="w-full px-3 py-2 bg-slate-700 border border-gray-300 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                             >
                                 <option value="">Все</option>
                                 <option value="normal">Низкий</option>
@@ -186,13 +186,13 @@ export default function MapView() {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Метод контроля
                             </label>
                             <select
                                 value={filters.method || ''}
                                 onChange={(e) => setFilters({ ...filters, method: e.target.value as any || undefined })}
-                                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                className="w-full px-3 py-2 bg-slate-700 border border-gray-300 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                             >
                                 <option value="">Все методы</option>
                                 <option value="VIK">VIK</option>
@@ -210,26 +210,26 @@ export default function MapView() {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Дата от
                             </label>
                             <input
                                 type="date"
                                 value={filters.date_from || ''}
                                 onChange={(e) => setFilters({ ...filters, date_from: e.target.value })}
-                                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                className="w-full px-3 py-2 bg-slate-700 border border-gray-300 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                             />
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Дата до
                             </label>
                             <input
                                 type="date"
                                 value={filters.date_to || ''}
                                 onChange={(e) => setFilters({ ...filters, date_to: e.target.value })}
-                                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                className="w-full px-3 py-2 bg-slate-700 border border-gray-300 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                             />
                         </div>
                     </div>
@@ -249,7 +249,7 @@ export default function MapView() {
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 {/* Depth Range */}
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-300 mb-2">
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
                                         Глубина (mm)
                                     </label>
                                     <div className="grid grid-cols-2 gap-2">
@@ -258,21 +258,21 @@ export default function MapView() {
                                             placeholder="От"
                                             value={paramRanges.depthMin}
                                             onChange={(e) => setParamRanges({ ...paramRanges, depthMin: e.target.value })}
-                                            className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                            className="w-full px-3 py-2 bg-slate-700 border border-gray-300 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
                                         />
                                         <input
                                             type="number"
                                             placeholder="До"
                                             value={paramRanges.depthMax}
                                             onChange={(e) => setParamRanges({ ...paramRanges, depthMax: e.target.value })}
-                                            className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                            className="w-full px-3 py-2 bg-slate-700 border border-gray-300 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
                                         />
                                     </div>
                                 </div>
 
                                 {/* Length Range */}
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-300 mb-2">
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
                                         Длина (mm)
                                     </label>
                                     <div className="grid grid-cols-2 gap-2">
@@ -281,21 +281,21 @@ export default function MapView() {
                                             placeholder="От"
                                             value={paramRanges.lengthMin}
                                             onChange={(e) => setParamRanges({ ...paramRanges, lengthMin: e.target.value })}
-                                            className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                            className="w-full px-3 py-2 bg-slate-700 border border-gray-300 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
                                         />
                                         <input
                                             type="number"
                                             placeholder="До"
                                             value={paramRanges.lengthMax}
                                             onChange={(e) => setParamRanges({ ...paramRanges, lengthMax: e.target.value })}
-                                            className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                            className="w-full px-3 py-2 bg-slate-700 border border-gray-300 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
                                         />
                                     </div>
                                 </div>
 
                                 {/* Width Range */}
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-300 mb-2">
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
                                         Ширина (mm)
                                     </label>
                                     <div className="grid grid-cols-2 gap-2">
@@ -304,14 +304,14 @@ export default function MapView() {
                                             placeholder="От"
                                             value={paramRanges.widthMin}
                                             onChange={(e) => setParamRanges({ ...paramRanges, widthMin: e.target.value })}
-                                            className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                            className="w-full px-3 py-2 bg-slate-700 border border-gray-300 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
                                         />
                                         <input
                                             type="number"
                                             placeholder="До"
                                             value={paramRanges.widthMax}
                                             onChange={(e) => setParamRanges({ ...paramRanges, widthMax: e.target.value })}
-                                            className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                            className="w-full px-3 py-2 bg-slate-700 border border-gray-300 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
                                         />
                                     </div>
                                 </div>
@@ -354,7 +354,7 @@ export default function MapView() {
             )}
 
             {/* Map */}
-            <div className="bg-slate-800 rounded-lg p-4 card-hover" style={{ height: '600px' }}>
+            <div className="bg-white rounded-lg p-4 card-hover" style={{ height: '600px' }}>
                 {loading ? (
                     <div className="flex items-center justify-center h-full">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
@@ -428,28 +428,28 @@ export default function MapView() {
             </div>
 
             {/* Legend */}
-            <div className="bg-slate-800 rounded-lg p-4">
+            <div className="bg-white rounded-lg p-4">
                 <h3 className="text-white font-semibold mb-3">Легенда</h3>
                 <div className="flex flex-wrap gap-4">
                     <div className="flex items-center">
                         <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: RISK_COLORS.normal }}></div>
-                        <span className="text-slate-300 text-sm">Низкий риск</span>
+                        <span className="text-gray-700 text-sm">Низкий риск</span>
                     </div>
                     <div className="flex items-center">
                         <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: RISK_COLORS.medium }}></div>
-                        <span className="text-slate-300 text-sm">Средний риск</span>
+                        <span className="text-gray-700 text-sm">Средний риск</span>
                     </div>
                     <div className="flex items-center">
                         <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: RISK_COLORS.high }}></div>
-                        <span className="text-slate-300 text-sm">Высокий риск</span>
+                        <span className="text-gray-700 text-sm">Высокий риск</span>
                     </div>
                     <div className="flex items-center">
                         <div className="w-8 h-0.5 bg-primary-500 mr-2"></div>
-                        <span className="text-slate-300 text-sm">Трубопровод</span>
+                        <span className="text-gray-700 text-sm">Трубопровод</span>
                     </div>
                 </div>
-                <p className="text-slate-400 text-sm mt-3">
-                    Объектов на карте: <strong className="text-white">{filteredObjects.length}</strong>
+                <p className="text-gray-600 text-sm mt-3">
+                    Объектов на карте: <strong className="text-gray-900">{filteredObjects.length}</strong>
                     {filteredObjects.length !== objects.length && (
                         <span> из {objects.length} (применены фильтры)</span>
                     )}

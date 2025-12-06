@@ -79,7 +79,7 @@ export default function ObjectsList() {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-bold text-white mb-2">Список объектов</h1>
-                    <p className="text-slate-400">Просмотр и поиск объектов контроля</p>
+                    <p className="text-gray-600">Просмотр и поиск объектов контроля</p>
                 </div>
                 <button
                     onClick={handleExportExcel}
@@ -92,25 +92,25 @@ export default function ObjectsList() {
             </div>
 
             {/* Search and Filters */}
-            <div className="bg-slate-800 rounded-lg p-4">
+            <div className="bg-white rounded-lg p-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-600" />
                         <input
                             type="text"
                             placeholder="Поиск по названию или ID..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                            className="w-full pl-10 pr-4 py-2 bg-slate-700 border border-gray-300 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
                         />
                     </div>
 
                     <div className="relative">
-                        <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
+                        <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-600" />
                         <select
                             value={filterType}
                             onChange={(e) => setFilterType(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                            className="w-full pl-10 pr-4 py-2 bg-slate-700 border border-gray-300 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                         >
                             <option value="">Все типы</option>
                             <option value="crane">Краны</option>
@@ -125,7 +125,7 @@ export default function ObjectsList() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Objects List */}
                 <div className="space-y-4">
-                    <h2 className="text-xl font-semibold text-white">
+                    <h2 className="text-xl font-semibold text-gray-900">
                         Объекты ({filteredObjects.length})
                     </h2>
 
@@ -139,7 +139,7 @@ export default function ObjectsList() {
                                 <div
                                     key={obj.object_id}
                                     onClick={() => loadObjectDetails(obj.object_id)}
-                                    className={`bg-slate-800 rounded-lg p-4 cursor-pointer transition-all ${selectedObject?.object_id === obj.object_id
+                                    className={`bg-white rounded-lg p-4 cursor-pointer transition-all ${selectedObject?.object_id === obj.object_id
                                         ? 'ring-2 ring-primary-500 bg-slate-700'
                                         : 'hover:bg-slate-700'
                                         }`}
@@ -147,15 +147,15 @@ export default function ObjectsList() {
                                     <div className="flex items-start justify-between">
                                         <div>
                                             <h3 className="text-white font-semibold">{obj.object_name}</h3>
-                                            <p className="text-slate-400 text-sm mt-1">
+                                            <p className="text-gray-600 text-sm mt-1">
                                                 ID: {obj.object_id} • {obj.pipeline_id}
                                             </p>
                                             <div className="flex gap-2 mt-2">
-                                                <span className="px-2 py-1 bg-slate-600 text-slate-300 rounded text-xs">
+                                                <span className="px-2 py-1 bg-slate-600 text-gray-700 rounded text-xs">
                                                     {obj.object_type}
                                                 </span>
                                                 {obj.year && (
-                                                    <span className="px-2 py-1 bg-slate-600 text-slate-300 rounded text-xs">
+                                                    <span className="px-2 py-1 bg-slate-600 text-gray-700 rounded text-xs">
                                                         {obj.year}
                                                     </span>
                                                 )}
@@ -171,11 +171,11 @@ export default function ObjectsList() {
                 {/* Object Details */}
                 <div>
                     <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-xl font-semibold text-white">Детали объекта</h2>
+                        <h2 className="text-xl font-semibold text-gray-900">Детали объекта</h2>
                         {selectedObject && (
                             <button
                                 onClick={() => setSelectedObject(null)}
-                                className="text-slate-400 hover:text-white transition-colors"
+                                className="text-gray-600 hover:text-white transition-colors"
                             >
                                 <X className="h-5 w-5" />
                             </button>
@@ -185,31 +185,31 @@ export default function ObjectsList() {
                     {selectedObject ? (
                         <div className="space-y-4">
                             {/* Object Info Card */}
-                            <div className="bg-slate-800 rounded-lg p-6">
+                            <div className="bg-white rounded-lg p-6">
                                 <h3 className="text-xl font-bold text-white mb-4">{selectedObject.object_name}</h3>
                                 <div className="grid grid-cols-2 gap-4 text-sm">
                                     <div>
-                                        <p className="text-slate-400">ID объекта</p>
+                                        <p className="text-gray-600">ID объекта</p>
                                         <p className="text-white font-medium">{selectedObject.object_id}</p>
                                     </div>
                                     <div>
-                                        <p className="text-slate-400">Тип</p>
+                                        <p className="text-gray-600">Тип</p>
                                         <p className="text-white font-medium">{selectedObject.object_type}</p>
                                     </div>
                                     <div>
-                                        <p className="text-slate-400">Трубопровод</p>
+                                        <p className="text-gray-600">Трубопровод</p>
                                         <p className="text-white font-medium">{selectedObject.pipeline_id}</p>
                                     </div>
                                     <div>
-                                        <p className="text-slate-400">Год</p>
+                                        <p className="text-gray-600">Год</p>
                                         <p className="text-white font-medium">{selectedObject.year || 'N/A'}</p>
                                     </div>
                                     <div>
-                                        <p className="text-slate-400">Материал</p>
+                                        <p className="text-gray-600">Материал</p>
                                         <p className="text-white font-medium">{selectedObject.material || 'N/A'}</p>
                                     </div>
                                     <div>
-                                        <p className="text-slate-400">Координаты</p>
+                                        <p className="text-gray-600">Координаты</p>
                                         <p className="text-white font-medium">
                                             {selectedObject.lat.toFixed(4)}, {selectedObject.lon.toFixed(4)}
                                         </p>
@@ -218,15 +218,15 @@ export default function ObjectsList() {
                             </div>
 
                             {/* Inspections History */}
-                            <div className="bg-slate-800 rounded-lg p-6">
+                            <div className="bg-white rounded-lg p-6">
                                 <div className="flex items-center justify-between mb-4">
-                                    <h3 className="text-lg font-semibold text-white">
+                                    <h3 className="text-lg font-semibold text-gray-900">
                                         История обследований ({inspections.length})
                                     </h3>
                                     <select
                                         value={sortBy}
                                         onChange={(e) => setSortBy(e.target.value as any)}
-                                        className="px-3 py-1 bg-slate-700 border border-slate-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                        className="px-3 py-1 bg-slate-700 border border-gray-300 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
                                     >
                                         <option value="none">По дате</option>
                                         <option value="depth_asc">По глубине ↑</option>
@@ -248,7 +248,7 @@ export default function ObjectsList() {
                                                 <div className="flex items-start justify-between mb-2">
                                                     <div>
                                                         <span className="text-white font-medium">{insp.method}</span>
-                                                        <p className="text-slate-400 text-sm">{insp.date}</p>
+                                                        <p className="text-gray-600 text-sm">{insp.date}</p>
                                                     </div>
                                                     {insp.ml_label && (
                                                         <span
@@ -265,21 +265,21 @@ export default function ObjectsList() {
                                                 </div>
                                                 {insp.defect_found && (
                                                     <div className="mt-2">
-                                                        <p className="text-slate-300 text-sm">
+                                                        <p className="text-gray-700 text-sm">
                                                             <strong>Дефект:</strong> {insp.defect_description || 'Не указан'}
                                                         </p>
                                                         {insp.quality_grade && (
-                                                            <p className="text-slate-300 text-sm mt-1">
+                                                            <p className="text-gray-700 text-sm mt-1">
                                                                 <strong>Оценка:</strong> {insp.quality_grade}
                                                             </p>
                                                         )}
                                                         {insp.param1 && (
-                                                            <p className="text-slate-300 text-sm mt-1">
+                                                            <p className="text-gray-700 text-sm mt-1">
                                                                 <strong>Параметры:</strong> {insp.param1}mm × {insp.param2}mm × {insp.param3}mm
                                                             </p>
                                                         )}
                                                         {insp.ml_confidence && (
-                                                            <p className="text-slate-300 text-sm mt-1">
+                                                            <p className="text-gray-700 text-sm mt-1">
                                                                 <strong>Уверенность ML:</strong> {(insp.ml_confidence * 100).toFixed(0)}%
                                                             </p>
                                                         )}
@@ -288,14 +288,14 @@ export default function ObjectsList() {
                                             </div>
                                         ))
                                     ) : (
-                                        <p className="text-slate-400 text-center py-8">Нет данных об обследованиях</p>
+                                        <p className="text-gray-600 text-center py-8">Нет данных об обследованиях</p>
                                     )}
                                 </div>
                             </div>
                         </div>
                     ) : (
-                        <div className="bg-slate-800 rounded-lg p-12 text-center">
-                            <p className="text-slate-400">Выберите объект для просмотра деталей</p>
+                        <div className="bg-white rounded-lg p-12 text-center">
+                            <p className="text-gray-600">Выберите объект для просмотра деталей</p>
                         </div>
                     )}
                 </div>

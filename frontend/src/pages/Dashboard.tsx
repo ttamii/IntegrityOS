@@ -39,7 +39,7 @@ export default function Dashboard() {
 
     if (!stats) {
         return (
-            <div className="text-center text-slate-400 py-12">
+            <div className="text-center text-gray-600 py-12">
                 <p>Не удалось загрузить статистику</p>
             </div>
         );
@@ -110,7 +110,7 @@ export default function Dashboard() {
             {/* Charts Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Defects by Method */}
-                <div className="bg-slate-800 rounded-lg p-6 card-hover">
+                <div className="bg-white rounded-lg p-6 card-hover">
                     <h2 className="text-xl font-semibold text-white mb-4">Дефекты по методам контроля</h2>
                     <ResponsiveContainer width="100%" height={300}>
                         <BarChart data={methodsData}>
@@ -127,7 +127,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* Risk Distribution */}
-                <div className="bg-slate-800 rounded-lg p-6 card-hover">
+                <div className="bg-white rounded-lg p-6 card-hover">
                     <h2 className="text-xl font-semibold text-white mb-4">Распределение по уровням риска</h2>
                     <ResponsiveContainer width="100%" height={300}>
                         <PieChart>
@@ -153,7 +153,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* Inspections Timeline */}
-                <div className="bg-slate-800 rounded-lg p-6 card-hover">
+                <div className="bg-white rounded-lg p-6 card-hover">
                     <h2 className="text-xl font-semibold text-white mb-4">Динамика обследований по годам</h2>
                     <ResponsiveContainer width="100%" height={300}>
                         <LineChart data={yearsData}>
@@ -171,7 +171,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* Defects Timeline */}
-                <div className="bg-slate-800 rounded-lg p-6 card-hover">
+                <div className="bg-white rounded-lg p-6 card-hover">
                     <h2 className="text-xl font-semibold text-white mb-4">Динамика дефектов по годам</h2>
                     <ResponsiveContainer width="100%" height={300}>
                         <LineChart data={defectsYearsData}>
@@ -191,23 +191,23 @@ export default function Dashboard() {
 
             {/* Top Risks Table */}
             {stats.top_risks.length > 0 && (
-                <div className="bg-slate-800 rounded-lg p-6 card-hover">
+                <div className="bg-white rounded-lg p-6 card-hover">
                     <h2 className="text-xl font-semibold text-white mb-4">Топ-5 критичных объектов</h2>
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead>
-                                <tr className="border-b border-slate-700">
-                                    <th className="text-left py-3 px-4 text-slate-300 font-medium">Объект</th>
-                                    <th className="text-left py-3 px-4 text-slate-300 font-medium">Описание</th>
-                                    <th className="text-left py-3 px-4 text-slate-300 font-medium">Уровень риска</th>
-                                    <th className="text-left py-3 px-4 text-slate-300 font-medium">Уверенность</th>
+                                <tr className="border-b border-gray-200">
+                                    <th className="text-left py-3 px-4 text-gray-700 font-medium">Объект</th>
+                                    <th className="text-left py-3 px-4 text-gray-700 font-medium">Описание</th>
+                                    <th className="text-left py-3 px-4 text-gray-700 font-medium">Уровень риска</th>
+                                    <th className="text-left py-3 px-4 text-gray-700 font-medium">Уверенность</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {stats.top_risks.map((risk, index) => (
-                                    <tr key={index} className="border-b border-slate-700 hover:bg-slate-700/50 transition-colors">
-                                        <td className="py-3 px-4 text-white">{risk.object_name}</td>
-                                        <td className="py-3 px-4 text-slate-300">{risk.description || 'N/A'}</td>
+                                    <tr key={index} className="border-b border-gray-200 hover:bg-slate-700/50 transition-colors">
+                                        <td className="py-3 px-4 text-gray-900">{risk.object_name}</td>
+                                        <td className="py-3 px-4 text-gray-700">{risk.description || 'N/A'}</td>
                                         <td className="py-3 px-4">
                                             <span
                                                 className="px-3 py-1 rounded-full text-sm font-medium"
@@ -219,7 +219,7 @@ export default function Dashboard() {
                                                 {risk.risk_level.toUpperCase()}
                                             </span>
                                         </td>
-                                        <td className="py-3 px-4 text-slate-300">
+                                        <td className="py-3 px-4 text-gray-700">
                                             {(risk.confidence * 100).toFixed(0)}%
                                         </td>
                                     </tr>
@@ -242,13 +242,13 @@ interface StatCardProps {
 
 function StatCard({ icon, label, value, color }: StatCardProps) {
     return (
-        <div className="bg-slate-800 rounded-lg p-6 card-hover">
+        <div className="bg-white rounded-lg p-6 card-hover">
             <div className="flex items-center justify-between">
                 <div>
-                    <p className="text-slate-400 text-sm mb-1">{label}</p>
-                    <p className="text-3xl font-bold text-white">{value}</p>
+                    <p className="text-gray-600 text-sm mb-1">{label}</p>
+                    <p className="text-3xl font-bold text-gray-900">{value}</p>
                 </div>
-                <div className={`${color} p-3 rounded-lg text-white`}>
+                <div className={`${color} p-3 rounded-lg text-gray-900`}>
                     {icon}
                 </div>
             </div>
