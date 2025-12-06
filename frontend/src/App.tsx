@@ -10,6 +10,7 @@ import About from './pages/About';
 import Login from './pages/Login';
 import DefectManagement from './pages/DefectManagement';
 import Profile from './pages/Profile';
+import Users from './pages/Users';
 import { LogOut } from 'lucide-react';
 
 // Protected Route wrapper
@@ -109,6 +110,7 @@ function MainLayout() {
                         <Route path="/import" element={<ImportData />} />
                         <Route path="/reports" element={<Reports />} />
                         <Route path="/profile" element={<Profile />} />
+                        <Route path="/users" element={<Users />} />
                         <Route path="/about" element={<About />} />
                     </Routes>
                 </main>
