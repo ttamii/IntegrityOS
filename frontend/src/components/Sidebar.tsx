@@ -10,17 +10,37 @@ import {
     LogOut,
     ChevronLeft,
     ChevronRight,
-    AlertTriangle
+    AlertTriangle,
+    X
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface SidebarProps {
     userRole?: 'admin' | 'inspector' | 'analyst' | 'guest';
+    isOpen?: boolean;
+    onClose?: () => void;
 }
 
-export default function Sidebar({ userRole = 'guest' }: SidebarProps) {
+export default function Sidebar({ userRole = 'guest', isOpen = true, onClose }: SidebarProps) {
     const location = useLocation();
     const [collapsed, setCollapsed] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 1024);
+        };
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
+    // Close sidebar on route change (mobile)
+    useEffect(() => {
+        if (isMobile && onClose) {
+            onClose();
+        }
+    }, [location.pathname]);
 
     const menuItems = [
         { path: '/', icon: LayoutDashboard, label: 'Панель управления', roles: ['admin', 'inspector', 'analyst', 'guest'] },
@@ -36,9 +56,82 @@ export default function Sidebar({ userRole = 'guest' }: SidebarProps) {
         item.roles.includes(userRole)
     );
 
+    // Mobile: show overlay when open
+    if (isMobile) {
+        if (!isOpen) return null;
+
+        return (
+            <>
+                {/* Overlay */}
+                <div
+                    className="fixed inset-0 bg-black bg-opacity-50 z-40"
+                    onClick={onClose}
+                />
+
+                {/* Mobile Sidebar */}
+                <div className="fixed left-0 top-0 h-screen w-72 bg-white border-r border-gray-200 flex flex-col z-50 shadow-xl">
+                    {/* Header with close button */}
+                    <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                                <span className="text-white font-bold text-sm">IO</span>
+                            </div>
+                            <span className="font-semibold text-gray-900">IntegrityOS</span>
+                        </div>
+                        <button
+                            onClick={onClose}
+                            className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+                        >
+                            <X className="h-5 w-5 text-gray-600" />
+                        </button>
+                    </div>
+
+                    {/* Navigation */}
+                    <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+                        {filteredMenuItems.map((item) => {
+                            const Icon = item.icon;
+                            const isActive = location.pathname === item.path;
+
+                            return (
+                                <Link
+                                    key={item.path}
+                                    to={item.path}
+                                    className={`
+                                        flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-colors
+                                        ${isActive
+                                            ? 'bg-blue-50 text-blue-600'
+                                            : 'text-gray-700 hover:bg-gray-50'
+                                        }
+                                    `}
+                                >
+                                    <Icon className={`h-5 w-5 ${isActive ? 'text-blue-600' : 'text-gray-500'}`} />
+                                    <span className={`font-medium ${isActive ? 'text-blue-600' : 'text-gray-700'}`}>
+                                        {item.label}
+                                    </span>
+                                </Link>
+                            );
+                        })}
+                    </nav>
+
+                    {/* User Section */}
+                    <div className="p-3 border-t border-gray-200 space-y-1">
+                        <Link
+                            to="/settings"
+                            className="flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-colors text-gray-700 hover:bg-gray-50"
+                        >
+                            <Settings className="h-5 w-5 text-gray-500" />
+                            <span className="font-medium">Настройки</span>
+                        </Link>
+                    </div>
+                </div>
+            </>
+        );
+    }
+
+    // Desktop sidebar
     return (
         <div
-            className={`${collapsed ? 'w-16' : 'w-64'} bg-white border-r border-gray-200 flex flex-col transition-all duration-300`}
+            className={`${collapsed ? 'w-16' : 'w-64'} bg-white border-r border-gray-200 flex-col transition-all duration-300 hidden lg:flex`}
             style={{ height: '100vh', position: 'fixed', left: 0, top: 0 }}
         >
             {/* Logo */}

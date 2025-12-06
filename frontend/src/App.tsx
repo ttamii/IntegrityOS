@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Sidebar from './components/Sidebar';
@@ -12,7 +13,7 @@ import DefectManagement from './pages/DefectManagement';
 import Profile from './pages/Profile';
 import Users from './pages/Users';
 import NotificationBell from './components/NotificationBell';
-import { LogOut } from 'lucide-react';
+import { LogOut, Menu } from 'lucide-react';
 
 // Protected Route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -37,6 +38,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 function MainLayout() {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const userRole = user?.role || 'guest';
 
     const getRoleName = (role: string) => {
@@ -52,22 +54,35 @@ function MainLayout() {
     return (
         <div className="flex min-h-screen bg-gray-50">
             {/* Sidebar */}
-            <Sidebar userRole={userRole} />
+            <Sidebar
+                userRole={userRole}
+                isOpen={mobileMenuOpen}
+                onClose={() => setMobileMenuOpen(false)}
+            />
 
             {/* Main Content */}
-            <div className="flex-1 ml-64">
+            <div className="flex-1 lg:ml-64">
                 {/* Header */}
-                <header className="bg-white border-b border-gray-200 px-8 py-4">
+                <header className="bg-white border-b border-gray-200 px-4 lg:px-8 py-4">
                     <div className="flex items-center justify-between">
-                        <div>
-                            <h1 className="text-2xl font-semibold text-gray-900">
-                                Система мониторинга трубопроводов
-                            </h1>
-                            <p className="text-sm text-gray-500 mt-1">
-                                Управление и контроль состояния магистральных трубопроводов
-                            </p>
-                        </div>
                         <div className="flex items-center space-x-4">
+                            {/* Mobile menu button */}
+                            <button
+                                onClick={() => setMobileMenuOpen(true)}
+                                className="lg:hidden p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
+                            >
+                                <Menu className="w-6 h-6" />
+                            </button>
+                            <div>
+                                <h1 className="text-xl lg:text-2xl font-semibold text-gray-900">
+                                    Система мониторинга трубопроводов
+                                </h1>
+                                <p className="text-sm text-gray-500 mt-1 hidden sm:block">
+                                    Управление и контроль состояния магистральных трубопроводов
+                                </p>
+                            </div>
+                        </div>
+                        <div className="flex items-center space-x-2 lg:space-x-4">
                             {/* Notifications */}
                             <NotificationBell />
 
