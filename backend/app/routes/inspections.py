@@ -65,3 +65,41 @@ async def create_inspection(
         raise HTTPException(status_code=404, detail="Object not found")
     
     return crud.create_inspection(db, inspection)
+
+
+@router.get("/{diag_id}/risk-analysis")
+def get_risk_analysis(diag_id: int, db: Session = Depends(get_db)):
+    """Get ML risk analysis with explanation, confidence and recommendations"""
+    from app.services.ml_classifier import get_risk_explanation
+    
+    inspection = crud.get_inspection(db, diag_id=diag_id)
+    if inspection is None:
+        raise HTTPException(status_code=404, detail="Inspection not found")
+    
+    # Convert DB model to schema for analysis
+    inspection_data = schemas.InspectionCreate(
+        diag_id=inspection.diag_id,
+        object_id=inspection.object_id,
+        method=inspection.method,
+        date=inspection.date,
+        temperature=inspection.temperature,
+        humidity=inspection.humidity,
+        illumination=inspection.illumination,
+        defect_found=inspection.defect_found,
+        defect_description=inspection.defect_description,
+        quality_grade=inspection.quality_grade,
+        param1=inspection.param1,
+        param2=inspection.param2,
+        param3=inspection.param3
+    )
+    
+    # Get explanation
+    analysis = get_risk_explanation(inspection_data)
+    
+    # Add inspection info
+    analysis['diag_id'] = diag_id
+    analysis['object_name'] = inspection.object.object_name if inspection.object else None
+    analysis['method'] = inspection.method.value if inspection.method else None
+    analysis['date'] = inspection.date.isoformat() if inspection.date else None
+    
+    return analysis

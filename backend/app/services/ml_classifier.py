@@ -200,3 +200,75 @@ def classify_risk(inspection: InspectionCreate) -> Tuple[RiskLevel, float]:
     """
     return classify_risk_ml(inspection)
 
+
+def get_risk_explanation(inspection: InspectionCreate) -> dict:
+    """
+    Get detailed explanation of why risk level was assigned
+    Returns: dict with risk_level, confidence, factors, recommendations
+    """
+    risk_level, confidence = classify_risk(inspection)
+    
+    factors = []
+    recommendations = []
+    
+    # Analyze quality grade
+    if inspection.quality_grade:
+        if inspection.quality_grade == QualityGrade.UNACCEPTABLE:
+            factors.append("Качество оценено как недопустимое")
+            recommendations.append("Требуется немедленный ремонт")
+        elif inspection.quality_grade == QualityGrade.REQUIRES_ACTION:
+            factors.append("Качество требует вмешательства")
+            recommendations.append("Запланировать ремонтные работы")
+        elif inspection.quality_grade == QualityGrade.ACCEPTABLE:
+            factors.append("Качество в пределах допуска")
+    
+    # Analyze defect parameters
+    if inspection.defect_found:
+        factors.append("Обнаружен дефект")
+        
+        if inspection.param1 and inspection.param1 > 10:
+            factors.append(f"Глубина дефекта критическая ({inspection.param1:.1f} мм)")
+            recommendations.append("Провести дополнительное обследование")
+        elif inspection.param1 and inspection.param1 > 5:
+            factors.append(f"Глубина дефекта повышенная ({inspection.param1:.1f} мм)")
+            
+        if inspection.param2 and inspection.param3:
+            area = inspection.param2 * inspection.param3
+            if area > 200:
+                factors.append(f"Большая площадь дефекта ({area:.1f} мм2)")
+                recommendations.append("Оценить целесообразность замены участка")
+            elif area > 50:
+                factors.append(f"Средняя площадь дефекта ({area:.1f} мм2)")
+    else:
+        factors.append("Дефект не обнаружен")
+    
+    # Analyze method
+    if inspection.method and inspection.method.value in ['UZK', 'RGK', 'MFL', 'UTWM']:
+        factors.append(f"Метод {inspection.method.value} - высокая точность")
+    
+    # Environmental factors
+    if inspection.temperature and (inspection.temperature < 5 or inspection.temperature > 35):
+        factors.append(f"Экстремальная температура ({inspection.temperature}C)")
+        recommendations.append("Повторить обследование в нормальных условиях")
+    
+    if inspection.humidity and inspection.humidity > 80:
+        factors.append(f"Высокая влажность ({inspection.humidity}%)")
+    
+    # Default recommendations based on risk level
+    if risk_level == RiskLevel.HIGH and not recommendations:
+        recommendations.append("Провести повторную диагностику")
+        recommendations.append("Подготовить план ремонтных работ")
+    elif risk_level == RiskLevel.MEDIUM and not recommendations:
+        recommendations.append("Продолжить мониторинг")
+        recommendations.append("Включить в план планового обслуживания")
+    elif risk_level == RiskLevel.NORMAL and not recommendations:
+        recommendations.append("Плановый мониторинг согласно графику")
+    
+    return {
+        'risk_level': risk_level.value,
+        'confidence': round(confidence * 100, 1),
+        'confidence_text': 'высокая' if confidence > 0.8 else 'средняя' if confidence > 0.6 else 'низкая',
+        'factors': factors,
+        'recommendations': recommendations,
+        'factors_count': len(factors)
+    }
