@@ -10,6 +10,7 @@ from app.database import get_db
 from app import models
 from app.services.report_generator import generate_html_report, generate_pdf_report
 
+
 # PDF imports
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
@@ -20,8 +21,51 @@ from reportlab.lib.enums import TA_CENTER, TA_LEFT
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
+# Register Cyrillic font
+try:
+    font_paths = [
+        "C:/Windows/Fonts/arial.ttf",
+        "C:/Windows/Fonts/DejaVuSans.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+    ]
+    for font_path in font_paths:
+        if os.path.exists(font_path):
+            pdfmetrics.registerFont(TTFont('CyrillicFont', font_path))
+            break
+except:
+    pass
+
+CYRILLIC_FONT = 'CyrillicFont'
+
 router = APIRouter()
 
+# Template files mapping (Latin names)
+TEMPLATE_FILES = {
+    'questionnaire': 'questionnaire.doc',
+    'express': 'express_report.docx',
+    'final': 'final_report.docx',
+    'csv': 'ffp_report.docx',
+    'ndt': 'ffp_report.docx',
+    'epb': 'epb_report.docx',
+}
+
+# Project root - parent of backend folder
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+
+@router.get("/template/{report_type}")
+async def download_template(report_type: str):
+    """Download report template file"""
+    if report_type not in TEMPLATE_FILES:
+        raise HTTPException(status_code=404, detail="Template not found")
+    
+    filename = TEMPLATE_FILES[report_type]
+    template_path = os.path.join(PROJECT_ROOT, filename)
+    
+    if not os.path.exists(template_path):
+        raise HTTPException(status_code=404, detail=f"File not found: {filename}")
+    
+    return FileResponse(template_path, filename=filename)
 
 @router.get("/generate")
 async def generate_report(
@@ -94,9 +138,9 @@ async def generate_defect_report(
     doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=2*cm, leftMargin=2*cm, topMargin=2*cm, bottomMargin=2*cm)
     
     styles = getSampleStyleSheet()
-    title_style = ParagraphStyle('title', parent=styles['Heading1'], alignment=TA_CENTER, spaceAfter=20)
-    heading_style = ParagraphStyle('heading', parent=styles['Heading2'], spaceAfter=10, spaceBefore=15)
-    normal_style = styles['Normal']
+    title_style = ParagraphStyle('title', parent=styles['Heading1'], fontName=CYRILLIC_FONT, alignment=TA_CENTER, spaceAfter=20)
+    heading_style = ParagraphStyle('heading', parent=styles['Heading2'], fontName=CYRILLIC_FONT, spaceAfter=10, spaceBefore=15)
+    normal_style = ParagraphStyle('normal', parent=styles['Normal'], fontName=CYRILLIC_FONT)
     
     elements = []
     
@@ -136,7 +180,7 @@ async def generate_defect_report(
         ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
         ('ALIGN', (0, 0), (0, -1), 'RIGHT'),
         ('ALIGN', (1, 0), (1, -1), 'LEFT'),
-        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTNAME', (0, 0), (-1, -1), CYRILLIC_FONT),
         ('FONTSIZE', (0, 0), (-1, -1), 10),
         ('BOX', (0, 0), (-1, -1), 1, colors.black),
         ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.grey),
@@ -152,11 +196,14 @@ async def generate_defect_report(
     # Inspection info
     if inspection:
         elements.append(Paragraph("Данные обследования", heading_style))
+        object_name = inspection.object.object_name if inspection.object else '-'
+        method_str = inspection.method.value if hasattr(inspection.method, 'value') else str(inspection.method) if inspection.method else '-'
+        quality_str = inspection.quality_grade.value if hasattr(inspection.quality_grade, 'value') else str(inspection.quality_grade) if inspection.quality_grade else '-'
         insp_data = [
-            ['Объект:', inspection.object_name or '-'],
+            ['Объект:', object_name],
             ['Дата обследования:', str(inspection.date) if inspection.date else '-'],
-            ['Метод:', inspection.method or '-'],
-            ['Оценка качества:', inspection.quality_grade or '-'],
+            ['Метод:', method_str],
+            ['Оценка качества:', quality_str],
         ]
         
         insp_table = Table(insp_data, colWidths=[5*cm, 11*cm])
@@ -164,6 +211,7 @@ async def generate_defect_report(
             ('BACKGROUND', (0, 0), (0, -1), colors.lightgrey),
             ('ALIGN', (0, 0), (0, -1), 'RIGHT'),
             ('ALIGN', (1, 0), (1, -1), 'LEFT'),
+            ('FONTNAME', (0, 0), (-1, -1), CYRILLIC_FONT),
             ('FONTSIZE', (0, 0), (-1, -1), 10),
             ('BOX', (0, 0), (-1, -1), 1, colors.black),
             ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.grey),
@@ -222,3 +270,4 @@ async def generate_defect_report(
         media_type="application/pdf",
         headers={"Content-Disposition": f"attachment; filename={filename}"}
     )
+

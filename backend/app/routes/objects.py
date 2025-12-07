@@ -195,3 +195,45 @@ def export_to_excel(
         headers={"Content-Disposition": f"attachment; filename={filename}"}
     )
 
+
+@router.delete("/{object_id}")
+async def delete_object(
+    object_id: int,
+    current_user: models.User = Depends(require_role(["admin"])),
+    db: Session = Depends(get_db)
+):
+    """Delete an object with all related data (cascade delete) - admin only"""
+    obj = crud.get_object(db, object_id=object_id)
+    if not obj:
+        raise HTTPException(status_code=404, detail="Object not found")
+    
+    # Get all inspections for this object
+    inspections = db.query(models.Inspection).filter(
+        models.Inspection.object_id == object_id
+    ).all()
+    
+    for inspection in inspections:
+        # Delete repair works and their notifications
+        works = db.query(models.RepairWork).filter(
+            models.RepairWork.inspection_id == inspection.id
+        ).all()
+        
+        for work in works:
+            db.query(models.Notification).filter(
+                models.Notification.work_id == work.id
+            ).delete()
+            db.delete(work)
+        
+        # Delete media files
+        db.query(models.Media).filter(
+            models.Media.inspection_id == inspection.id
+        ).delete()
+        
+        # Delete inspection
+        db.delete(inspection)
+    
+    # Delete the object
+    db.delete(obj)
+    db.commit()
+    
+    return {"message": f"Object {object_id} and all related data deleted successfully"}

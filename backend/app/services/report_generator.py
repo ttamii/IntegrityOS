@@ -11,7 +11,33 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak
 from reportlab.lib.enums import TA_CENTER, TA_LEFT
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
 import os
+
+# Register DejaVuSans font for Cyrillic support
+try:
+    # Try to find DejaVuSans in common locations
+    font_paths = [
+        "C:/Windows/Fonts/DejaVuSans.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        os.path.join(os.path.dirname(__file__), "fonts", "DejaVuSans.ttf"),
+    ]
+    font_registered = False
+    for font_path in font_paths:
+        if os.path.exists(font_path):
+            pdfmetrics.registerFont(TTFont('DejaVuSans', font_path))
+            font_registered = True
+            break
+    
+    if not font_registered:
+        # Use Arial as fallback on Windows
+        if os.path.exists("C:/Windows/Fonts/arial.ttf"):
+            pdfmetrics.registerFont(TTFont('DejaVuSans', "C:/Windows/Fonts/arial.ttf"))
+except Exception as e:
+    print(f"Warning: Could not register Cyrillic font: {e}")
+
+CYRILLIC_FONT = 'DejaVuSans'
 
 
 def _generate_excavation_recommendations(inspections) -> str:
@@ -27,7 +53,7 @@ def _generate_excavation_recommendations(inspections) -> str:
     
     rows = ""
     for idx, insp in enumerate(high_risk_defects[:10], 1):  # Top 10
-        priority = "🔴 Высокий" if idx <= 3 else "🟡 Средний" if idx <= 7 else "🟢 Низкий"
+        priority = "ВЫСОКИЙ" if idx <= 3 else "СРЕДНИЙ" if idx <= 7 else "НИЗКИЙ"
         
         # Get coordinates from object if available
         coords = "N/A"
@@ -196,7 +222,7 @@ def generate_html_report(inspections, stats, date_from: Optional[date], date_to:
                 </div>
             </div>
             
-            <h2>🔍 Дефекты по методам контроля</h2>
+            <h2>Дефекты по методам контроля</h2>
             <table>
                 <thead>
                     <tr>
@@ -209,7 +235,7 @@ def generate_html_report(inspections, stats, date_from: Optional[date], date_to:
                 </tbody>
             </table>
             
-            <h2>⚠️ Распределение по уровням риска</h2>
+            <h2>Распределение по уровням риска</h2>
             <table>
                 <thead>
                     <tr>
@@ -222,7 +248,7 @@ def generate_html_report(inspections, stats, date_from: Optional[date], date_to:
                 </tbody>
             </table>
             
-            <h2>📋 Список дефектов</h2>
+            <h2>Список дефектов</h2>
             <table>
                 <thead>
                     <tr>
@@ -238,7 +264,7 @@ def generate_html_report(inspections, stats, date_from: Optional[date], date_to:
                 </tbody>
             </table>
             
-            <h2>🚧 Рекомендации по раскопкам</h2>
+            <h2>Рекомендации по раскопкам</h2>
             <p style="color: #6b7280; margin-bottom: 20px;">
                 На основе анализа дефектов с высоким уровнем риска рекомендуется провести раскопки на следующих участках:
             </p>
@@ -284,24 +310,44 @@ def generate_pdf_report(inspections, stats, date_from: Optional[date], date_to: 
     title_style = ParagraphStyle(
         'CustomTitle',
         parent=styles['Heading1'],
+        fontName=CYRILLIC_FONT,
         fontSize=24,
         textColor=colors.HexColor('#1f2937'),
         spaceAfter=30,
         alignment=TA_CENTER
     )
+    
+    # Normal style with Cyrillic font
+    normal_style = ParagraphStyle(
+        'CyrillicNormal',
+        parent=styles['Normal'],
+        fontName=CYRILLIC_FONT,
+        fontSize=10
+    )
+    
+    # Heading style with Cyrillic font
+    heading_style = ParagraphStyle(
+        'CyrillicHeading',
+        parent=styles['Heading2'],
+        fontName=CYRILLIC_FONT,
+        fontSize=14,
+        textColor=colors.HexColor('#1f2937'),
+        spaceAfter=12
+    )
+    
     story.append(Paragraph("IntegrityOS - Отчет по обследованиям", title_style))
     story.append(Spacer(1, 12))
     
     # Date range
     if date_from or date_to:
         date_text = f"Период: {date_from or 'начало'} - {date_to or 'настоящее время'}"
-        story.append(Paragraph(date_text, styles['Normal']))
+        story.append(Paragraph(date_text, normal_style))
     
-    story.append(Paragraph(f"Дата создания: {datetime.now().strftime('%Y-%m-%d %H:%M')}", styles['Normal']))
+    story.append(Paragraph(f"Дата создания: {datetime.now().strftime('%Y-%m-%d %H:%M')}", normal_style))
     story.append(Spacer(1, 20))
     
     # Statistics
-    story.append(Paragraph("Общая статистика", styles['Heading2']))
+    story.append(Paragraph("Общая статистика", heading_style))
     stats_data = [
         ['Показатель', 'Значение'],
         ['Всего объектов', str(stats['total_objects'])],
@@ -314,7 +360,7 @@ def generate_pdf_report(inspections, stats, date_from: Optional[date], date_to: 
         ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#3b82f6')),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
         ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTNAME', (0, 0), (-1, -1), CYRILLIC_FONT),
         ('FONTSIZE', (0, 0), (-1, 0), 12),
         ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
         ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
@@ -325,7 +371,7 @@ def generate_pdf_report(inspections, stats, date_from: Optional[date], date_to: 
     
     # Top risks
     if stats['top_risks']:
-        story.append(Paragraph("Топ-5 критичных объектов", styles['Heading2']))
+        story.append(Paragraph("Топ-5 критичных объектов", heading_style))
         risks_data = [['Объект', 'Описание', 'Риск']]
         for risk in stats['top_risks'][:5]:
             risks_data.append([
@@ -339,7 +385,7 @@ def generate_pdf_report(inspections, stats, date_from: Optional[date], date_to: 
             ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#ef4444')),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
             ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTNAME', (0, 0), (-1, -1), CYRILLIC_FONT),
             ('FONTSIZE', (0, 0), (-1, 0), 10),
             ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
             ('GRID', (0, 0), (-1, -1), 1, colors.black)

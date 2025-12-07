@@ -5,7 +5,7 @@ import os
 from dotenv import load_dotenv
 
 from app.database import init_db, SessionLocal
-from app.routes import objects, inspections, dashboard, import_data, reports, admin, auth, media, repair_works, notifications
+from app.routes import objects, inspections, dashboard, import_data, reports, admin, auth, media, repair_works, notifications, pipelines
 from app import models
 from app.auth import get_password_hash
 
@@ -28,14 +28,14 @@ def create_default_users():
                 "username": "inspector",
                 "email": "inspector@integrityos.kz",
                 "password": "inspector123",
-                "full_name": "Иванов Петр Сергеевич",
+                "full_name": "Инспектор",
                 "role": models.UserRole.INSPECTOR
             },
             {
                 "username": "analyst",
                 "email": "analyst@integrityos.kz",
                 "password": "analyst123",
-                "full_name": "Сидорова Анна Михайловна",
+                "full_name": "Аналитик",
                 "role": models.UserRole.ANALYST
             },
             {
@@ -99,7 +99,7 @@ app = FastAPI(
 )
 
 # CORS configuration
-origins = os.getenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:5173").split(",")
+origins = os.getenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:5173,http://localhost:5174").split(",")
 
 app.add_middleware(
     CORSMiddleware,
@@ -120,6 +120,7 @@ app.include_router(admin.router, prefix="/api/admin", tags=["Admin"])
 app.include_router(media.router, prefix="/api/media", tags=["Media"])
 app.include_router(repair_works.router, prefix="/api/works", tags=["Repair Works"])
 app.include_router(notifications.router, prefix="/api/notifications", tags=["Notifications"])
+app.include_router(pipelines.router, prefix="/api/pipelines", tags=["Pipelines"])
 
 
 @app.get("/")

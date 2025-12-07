@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import {
     AlertTriangle, Camera, Wrench, CheckCircle,
-    Plus, X, Upload, Calendar, XCircle, SortAsc, SortDesc, Clock, List, FileDown
+    Plus, X, Upload, Calendar, XCircle, SortAsc, SortDesc, Clock, List, FileDown, Trash2
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -62,6 +62,9 @@ export default function DefectManagement() {
     const [selectedWork, setSelectedWork] = useState<RepairWork | null>(null);
     const [workMedia, setWorkMedia] = useState<Media[]>([]);
     const [zoomedImage, setZoomedImage] = useState<string | null>(null);
+    const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; workId: number | null; workTitle: string }>({
+        show: false, workId: null, workTitle: ''
+    });
 
     const [workForm, setWorkForm] = useState({
         title: '',
@@ -277,7 +280,7 @@ export default function DefectManagement() {
     const handleDeletePhoto = async (mediaId: number) => {
         if (!token || !selectedDefect) return;
 
-        if (!confirm('Вы уверены, что хотите удалить это фото?')) return;
+        // Delete photo directly (confirmation removed - button position makes it intentional)
 
         try {
             const response = await fetch(`${API_URL}/api/media/${mediaId}`, {
@@ -296,6 +299,35 @@ export default function DefectManagement() {
         } catch (error) {
             console.error('Error deleting photo:', error);
         }
+    };
+
+    const handleDeleteWork = async (workId: number) => {
+        if (!token) return;
+
+        try {
+            const response = await fetch(`${API_URL}/api/works/${workId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                fetchAllWorks();
+                if (selectedDefect) fetchWorks(selectedDefect.id);
+                setSelectedWork(null);
+                setDeleteConfirm({ show: false, workId: null, workTitle: '' });
+            } else {
+                const error = await response.json();
+                alert(error.detail || 'Ошибка при удалении работы');
+            }
+        } catch (error) {
+            console.error('Error deleting work:', error);
+        }
+    };
+
+    const openDeleteConfirm = (work: RepairWork) => {
+        setDeleteConfirm({ show: true, workId: work.id, workTitle: work.title });
     };
 
     const getPriorityColor = (priority: string) => {
@@ -515,6 +547,46 @@ export default function DefectManagement() {
                                         <div>
                                             <span className="text-gray-500">Риск:</span>
                                             <p className="font-medium">{selectedDefect.ml_label || '-'}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Workflow Progress Steps */}
+                                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-200">
+                                    <h3 className="font-semibold text-gray-900 mb-3 text-sm">Рабочий процесс</h3>
+                                    <div className="flex items-center justify-between text-xs">
+                                        <div className={`flex flex-col items-center ${media.filter(m => m.is_before).length > 0 ? 'text-green-600' : 'text-gray-400'}`}>
+                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-1 ${media.filter(m => m.is_before).length > 0 ? 'bg-green-100 text-green-600' : 'bg-gray-100'}`}>
+                                                {media.filter(m => m.is_before).length > 0 ? <CheckCircle className="w-5 h-5" /> : <span className="font-bold">1</span>}
+                                            </div>
+                                            <span className="text-center">Фото до</span>
+                                        </div>
+                                        <div className="flex-1 h-1 bg-gray-200 mx-2 rounded">
+                                            <div className={`h-full rounded ${media.filter(m => m.is_before).length > 0 ? 'bg-green-400' : ''}`} style={{ width: media.filter(m => m.is_before).length > 0 ? '100%' : '0%' }}></div>
+                                        </div>
+                                        <div className={`flex flex-col items-center ${works.length > 0 ? 'text-green-600' : 'text-gray-400'}`}>
+                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-1 ${works.length > 0 ? 'bg-green-100 text-green-600' : 'bg-gray-100'}`}>
+                                                {works.length > 0 ? <CheckCircle className="w-5 h-5" /> : <span className="font-bold">2</span>}
+                                            </div>
+                                            <span className="text-center">Работа</span>
+                                        </div>
+                                        <div className="flex-1 h-1 bg-gray-200 mx-2 rounded">
+                                            <div className={`h-full rounded ${works.length > 0 ? 'bg-green-400' : ''}`} style={{ width: works.length > 0 ? '100%' : '0%' }}></div>
+                                        </div>
+                                        <div className={`flex flex-col items-center ${media.filter(m => !m.is_before).length > 0 ? 'text-green-600' : 'text-gray-400'}`}>
+                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-1 ${media.filter(m => !m.is_before).length > 0 ? 'bg-green-100 text-green-600' : 'bg-gray-100'}`}>
+                                                {media.filter(m => !m.is_before).length > 0 ? <CheckCircle className="w-5 h-5" /> : <span className="font-bold">3</span>}
+                                            </div>
+                                            <span className="text-center">Фото после</span>
+                                        </div>
+                                        <div className="flex-1 h-1 bg-gray-200 mx-2 rounded">
+                                            <div className={`h-full rounded ${works.some(w => w.status === 'completed') ? 'bg-green-400' : ''}`} style={{ width: works.some(w => w.status === 'completed') ? '100%' : '0%' }}></div>
+                                        </div>
+                                        <div className={`flex flex-col items-center ${works.some(w => w.status === 'completed') ? 'text-green-600' : 'text-gray-400'}`}>
+                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-1 ${works.some(w => w.status === 'completed') ? 'bg-green-100 text-green-600' : 'bg-gray-100'}`}>
+                                                {works.some(w => w.status === 'completed') ? <CheckCircle className="w-5 h-5" /> : <span className="font-bold">4</span>}
+                                            </div>
+                                            <span className="text-center">Готово</span>
                                         </div>
                                     </div>
                                 </div>
@@ -869,6 +941,18 @@ export default function DefectManagement() {
                                             Ожидает проверки
                                         </span>
                                     )}
+                                    {isAdmin && (
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                openDeleteConfirm(work);
+                                            }}
+                                            className="ml-2 p-1.5 text-red-500 hover:bg-red-50 rounded transition-colors"
+                                            title="Удалить работу"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         ))}
@@ -1064,6 +1148,37 @@ export default function DefectManagement() {
                         onClick={(e) => e.stopPropagation()}
                     />
                     <p className="absolute bottom-4 text-white text-sm">Нажмите в любом месте для закрытия</p>
+                </div>
+            )}
+
+            {/* Delete Confirmation Modal */}
+            {deleteConfirm.show && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-xl shadow-2xl p-6 max-w-md w-full mx-4 transform animate-pulse-once">
+                        <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full">
+                            <Trash2 className="w-8 h-8 text-red-600" />
+                        </div>
+                        <h3 className="text-xl font-semibold text-center text-gray-900 mb-2">
+                            Удалить работу?
+                        </h3>
+                        <p className="text-center text-gray-500 mb-6">
+                            Вы уверены, что хотите удалить работу <span className="font-medium text-gray-700">"{deleteConfirm.workTitle}"</span>? Это действие нельзя отменить.
+                        </p>
+                        <div className="flex space-x-3">
+                            <button
+                                onClick={() => setDeleteConfirm({ show: false, workId: null, workTitle: '' })}
+                                className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                            >
+                                Отмена
+                            </button>
+                            <button
+                                onClick={() => deleteConfirm.workId && handleDeleteWork(deleteConfirm.workId)}
+                                className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+                            >
+                                Удалить
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>

@@ -40,11 +40,7 @@ function PipeSegment({
         }
     };
 
-    useFrame(() => {
-        if (meshRef.current && (hovered || isSelected)) {
-            meshRef.current.rotation.z += 0.01;
-        }
-    });
+    // Removed spin animation - was confusing
 
     return (
         <group position={position}>
@@ -154,69 +150,37 @@ export default function Pipeline3D() {
 
     useEffect(() => {
         fetchData();
-    }, [token]);
+    }, [token, selectedPipeline]);
 
     const fetchData = async () => {
         if (!token) return;
 
         try {
-            // Fetch inspections with risk data
-            const response = await fetch(`${API_URL}/api/inspections?limit=100`, {
+            setLoading(true);
+            // Fetch 3D visualization data from dedicated endpoint
+            const url = selectedPipeline === 'all'
+                ? `${API_URL}/api/pipelines/visualization/3d`
+                : `${API_URL}/api/pipelines/visualization/3d?pipeline_id=${selectedPipeline}`;
+
+            const response = await fetch(url, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
 
             if (response.ok) {
-                const inspections = await response.json();
+                const data = await response.json();
 
-                // Group by object and calculate risk
-                const objectMap = new Map<number, {
-                    defects: number;
-                    risk: string;
-                    pipeline: string;
-                    name: string;
-                }>();
+                // Set pipelines for dropdown
+                setPipelines(data.pipelines.map((p: any) => p.id));
 
-                const pipelineSet = new Set<string>();
-
-                inspections.forEach((insp: any) => {
-                    pipelineSet.add(insp.pipeline_id || 'Unknown');
-
-                    const existing = objectMap.get(insp.object_id);
-                    const defectCount = insp.defect_found ? 1 : 0;
-
-                    if (existing) {
-                        existing.defects += defectCount;
-                        // Upgrade risk level if higher found
-                        if (insp.ml_label === 'high' || insp.ml_label === 'critical') {
-                            existing.risk = insp.ml_label;
-                        }
-                    } else {
-                        objectMap.set(insp.object_id, {
-                            defects: defectCount,
-                            risk: insp.ml_label || 'low',
-                            pipeline: insp.pipeline_id || 'Unknown',
-                            name: insp.object_name || `Объект ${insp.object_id}`
-                        });
-                    }
-                });
-
-                setPipelines(Array.from(pipelineSet));
-
-                // Convert to segments
-                const segs: PipelineSegment[] = [];
-                let pos = 0;
-                objectMap.forEach((value, key) => {
-                    segs.push({
-                        id: key,
-                        position: pos++,
-                        riskLevel: value.risk as any,
-                        defectsCount: value.defects,
-                        pipelineId: value.pipeline,
-                        objectName: value.name
-                    });
-                });
-
-                setSegments(segs);
+                // Set segments from API data
+                setSegments(data.segments.map((seg: any) => ({
+                    id: seg.id,
+                    position: seg.position,
+                    riskLevel: seg.riskLevel,
+                    defectsCount: seg.defectsCount,
+                    pipelineId: seg.pipelineId,
+                    objectName: seg.objectName
+                })));
             }
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -225,14 +189,13 @@ export default function Pipeline3D() {
         }
     };
 
-    const filteredSegments = selectedPipeline === 'all'
-        ? segments.slice(0, 20) // Limit for performance
-        : segments.filter(s => s.pipelineId === selectedPipeline).slice(0, 20);
+    // API already returns filtered segments, just use directly (limited to 30 for performance)
+    const filteredSegments = segments.slice(0, 30);
 
     return (
         <div className="h-[calc(100vh-120px)] relative">
             {/* Header */}
-            <div className="absolute top-0 left-0 right-0 z-10 bg-white bg-opacity-90 backdrop-blur-sm border-b border-gray-200 px-6 py-4">
+            <div className="absolute top-0 left-0 right-0 z-50 bg-white bg-opacity-90 backdrop-blur-sm border-b border-gray-200 px-6 py-4">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                         <Box className="w-6 h-6 text-blue-600" />

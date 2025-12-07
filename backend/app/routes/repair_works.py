@@ -243,3 +243,21 @@ async def approve_work(
     return work
 
 
+@router.delete("/{work_id}")
+async def delete_repair_work(
+    work_id: int,
+    current_user: models.User = Depends(require_role(["admin"])),
+    db: Session = Depends(get_db)
+):
+    """Delete a repair work (admin only)"""
+    work = db.query(models.RepairWork).filter(models.RepairWork.id == work_id).first()
+    if not work:
+        raise HTTPException(status_code=404, detail="Work not found")
+    
+    # Delete related notifications
+    db.query(models.Notification).filter(models.Notification.work_id == work_id).delete()
+    
+    db.delete(work)
+    db.commit()
+    
+    return {"message": "Work deleted successfully"}

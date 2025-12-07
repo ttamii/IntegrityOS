@@ -33,7 +33,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const initAuth = async () => {
             if (token) {
                 try {
+                    // Add timeout to prevent infinite loading
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
                     const userData = await authAPI.getMe(token);
+                    clearTimeout(timeoutId);
                     setUser(userData);
                 } catch (error) {
                     console.error('Failed to fetch user:', error);
