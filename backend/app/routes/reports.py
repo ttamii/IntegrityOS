@@ -73,78 +73,201 @@ async def generate_filled_report(
     report_type: str,
     db: Session = Depends(get_db)
 ):
-    """Generate report filled with actual data from database"""
+    """Generate report filled with actual data - different structure per type"""
     from docx import Document
-    from docx.shared import Pt
+    from docx.shared import Pt, Inches
+    from docx.enum.text import WD_ALIGN_PARAGRAPH
     import tempfile
     from datetime import datetime
     
     if report_type not in TEMPLATE_FILES:
         raise HTTPException(status_code=404, detail="Report type not found")
     
-    # Get repair works data
-    repair_works = db.query(models.RepairWork).order_by(models.RepairWork.created_at.desc()).limit(50).all()
-    
-    # Create new document
     doc = Document()
+    now = datetime.now()
     
-    # Title
-    title = doc.add_heading('IntegrityOS - Отчет по работам', 0)
+    # Get data from database
+    objects = db.query(models.Object).limit(20).all()
+    inspections = db.query(models.Inspection).order_by(models.Inspection.date.desc()).limit(30).all()
+    repair_works = db.query(models.RepairWork).order_by(models.RepairWork.created_at.desc()).limit(20).all()
     
-    # Info section
-    doc.add_paragraph(f'Дата формирования: {datetime.now().strftime("%d.%m.%Y %H:%M")}')
-    doc.add_paragraph(f'Тип отчета: {report_type}')
-    doc.add_paragraph(f'Количество записей: {len(repair_works)}')
-    doc.add_paragraph()
-    
-    # Table with works
-    if repair_works:
-        table = doc.add_table(rows=1, cols=5)
+    if report_type == 'questionnaire':
+        # ОПРОСНЫЙ ЛИСТ - Survey form
+        doc.add_heading('ОПРОСНЫЙ ЛИСТ', 0)
+        doc.add_paragraph(f'Дата: {now.strftime("%d.%m.%Y")}')
+        doc.add_paragraph()
+        
+        doc.add_heading('Характеристики трубопровода', level=1)
+        table = doc.add_table(rows=6, cols=2)
         table.style = 'Table Grid'
+        rows = table.rows
+        rows[0].cells[0].text = 'Наименование объекта'
+        rows[0].cells[1].text = objects[0].object_name if objects else 'Нет данных'
+        rows[1].cells[0].text = 'Тип объекта'
+        rows[1].cells[1].text = objects[0].object_type if objects else 'Нет данных'
+        rows[2].cells[0].text = 'Год постройки'
+        rows[2].cells[1].text = str(objects[0].year) if objects and objects[0].year else 'Нет данных'
+        rows[3].cells[0].text = 'Материал'
+        rows[3].cells[1].text = objects[0].material if objects and objects[0].material else 'Нет данных'
+        rows[4].cells[0].text = 'Количество объектов'
+        rows[4].cells[1].text = str(len(objects))
+        rows[5].cells[0].text = 'Количество обследований'
+        rows[5].cells[1].text = str(len(inspections))
         
-        # Header row
-        header = table.rows[0].cells
-        header[0].text = 'ID'
-        header[1].text = 'Описание'
-        header[2].text = 'Статус'
-        header[3].text = 'Приоритет'
-        header[4].text = 'Дата'
+        doc.add_paragraph()
+        doc.add_heading('Требования к диагностике', level=1)
+        doc.add_paragraph('1. Визуальный и измерительный контроль (ВИК)')
+        doc.add_paragraph('2. Ультразвуковая толщинометрия (UTWM)')
+        doc.add_paragraph('3. Магнитопорошковый контроль (МПК)')
         
-        # Data rows
-        for work in repair_works:
-            row = table.add_row().cells
-            row[0].text = str(work.id)
-            row[1].text = work.description or 'Нет описания'
-            row[2].text = work.status.value if work.status else 'N/A'
-            row[3].text = work.priority.value if work.priority else 'N/A'
-            row[4].text = work.created_at.strftime('%d.%m.%Y') if work.created_at else 'N/A'
-    else:
-        doc.add_paragraph('Нет данных о работах')
+    elif report_type == 'express':
+        # ЭКСПРЕСС-ОТЧЁТ - Quick summary
+        doc.add_heading('ЭКСПРЕСС-ОТЧЁТ', 0)
+        doc.add_paragraph(f'Дата формирования: {now.strftime("%d.%m.%Y %H:%M")}')
+        doc.add_paragraph()
+        
+        doc.add_heading('Краткая сводка', level=1)
+        defects_found = sum(1 for i in inspections if i.defect_found)
+        doc.add_paragraph(f'Всего обследований: {len(inspections)}')
+        doc.add_paragraph(f'Обнаружено дефектов: {defects_found}')
+        doc.add_paragraph(f'Без дефектов: {len(inspections) - defects_found}')
+        
+        doc.add_heading('Последние обследования', level=1)
+        if inspections:
+            table = doc.add_table(rows=1, cols=4)
+            table.style = 'Table Grid'
+            header = table.rows[0].cells
+            header[0].text = 'Дата'
+            header[1].text = 'Метод'
+            header[2].text = 'Дефект'
+            header[3].text = 'Оценка'
+            for insp in inspections[:10]:
+                row = table.add_row().cells
+                row[0].text = insp.date.strftime('%d.%m.%Y') if insp.date else '-'
+                row[1].text = insp.method.value if insp.method else '-'
+                row[2].text = 'Да' if insp.defect_found else 'Нет'
+                row[3].text = insp.quality_grade.value if insp.quality_grade else '-'
+                
+    elif report_type == 'final':
+        # ЗАКЛЮЧИТЕЛЬНЫЙ ОТЧЁТ - Full documentation
+        doc.add_heading('ЗАКЛЮЧИТЕЛЬНЫЙ ОТЧЁТ', 0)
+        doc.add_heading('по результатам диагностики', level=2)
+        doc.add_paragraph(f'Дата: {now.strftime("%d.%m.%Y")}')
+        doc.add_paragraph()
+        
+        doc.add_heading('1. Общие сведения', level=1)
+        doc.add_paragraph(f'Количество обследованных объектов: {len(objects)}')
+        doc.add_paragraph(f'Период диагностики: {inspections[-1].date.strftime("%d.%m.%Y") if inspections else "-"} - {inspections[0].date.strftime("%d.%m.%Y") if inspections else "-"}')
+        
+        doc.add_heading('2. Результаты диагностики', level=1)
+        methods = {}
+        for insp in inspections:
+            m = insp.method.value if insp.method else 'Другой'
+            methods[m] = methods.get(m, 0) + 1
+        for method, count in methods.items():
+            doc.add_paragraph(f'{method}: {count} обследований')
+            
+        doc.add_heading('3. Выявленные дефекты', level=1)
+        defects = [i for i in inspections if i.defect_found]
+        if defects:
+            table = doc.add_table(rows=1, cols=3)
+            table.style = 'Table Grid'
+            header = table.rows[0].cells
+            header[0].text = 'Дата'
+            header[1].text = 'Метод'
+            header[2].text = 'Описание'
+            for d in defects[:15]:
+                row = table.add_row().cells
+                row[0].text = d.date.strftime('%d.%m.%Y') if d.date else '-'
+                row[1].text = d.method.value if d.method else '-'
+                row[2].text = d.defect_description or 'Нет описания'
+        else:
+            doc.add_paragraph('Дефекты не выявлены')
+            
+        doc.add_heading('4. Заключение', level=1)
+        doc.add_paragraph('По результатам проведенной диагностики состояние объектов оценивается как удовлетворительное.')
+        
+    elif report_type in ['csv', 'ndt']:
+        # CSV/FFP и ДДК-ОТЧЁТ - Data table format
+        title = 'ОТЧЁТ ПО ДАННЫМ FFP' if report_type == 'csv' else 'ДДК-ОТЧЁТ (Верификация дефектов)'
+        doc.add_heading(title, 0)
+        doc.add_paragraph(f'Дата: {now.strftime("%d.%m.%Y")}')
+        doc.add_paragraph()
+        
+        doc.add_heading('Данные обследований', level=1)
+        if inspections:
+            table = doc.add_table(rows=1, cols=6)
+            table.style = 'Table Grid'
+            header = table.rows[0].cells
+            header[0].text = 'ID'
+            header[1].text = 'Объект'
+            header[2].text = 'Дата'
+            header[3].text = 'Метод'
+            header[4].text = 'Дефект'
+            header[5].text = 'Параметры'
+            for insp in inspections:
+                row = table.add_row().cells
+                row[0].text = str(insp.diag_id)
+                obj_name = insp.object.object_name if insp.object else '-'
+                row[1].text = obj_name[:20] if len(obj_name) > 20 else obj_name
+                row[2].text = insp.date.strftime('%d.%m.%Y') if insp.date else '-'
+                row[3].text = insp.method.value if insp.method else '-'
+                row[4].text = 'Да' if insp.defect_found else 'Нет'
+                params = f'{insp.param1 or "-"}/{insp.param2 or "-"}/{insp.param3 or "-"}'
+                row[5].text = params
+                
+    elif report_type == 'epb':
+        # ЗАКЛЮЧЕНИЕ ЭПБ - Safety expertise
+        doc.add_heading('ЗАКЛЮЧЕНИЕ', 0)
+        doc.add_heading('экспертизы промышленной безопасности', level=2)
+        doc.add_paragraph(f'Дата: {now.strftime("%d.%m.%Y")}')
+        doc.add_paragraph()
+        
+        doc.add_heading('1. Объект экспертизы', level=1)
+        doc.add_paragraph(f'Наименование: {objects[0].object_name if objects else "Трубопровод"}')
+        doc.add_paragraph(f'Тип: Магистральный трубопровод')
+        
+        doc.add_heading('2. Цель экспертизы', level=1)
+        doc.add_paragraph('Определение соответствия объекта требованиям промышленной безопасности.')
+        
+        doc.add_heading('3. Результаты экспертизы', level=1)
+        doc.add_paragraph(f'Проведено обследований: {len(inspections)}')
+        defects = sum(1 for i in inspections if i.defect_found)
+        doc.add_paragraph(f'Выявлено дефектов: {defects}')
+        
+        doc.add_heading('4. Выводы', level=1)
+        if defects > len(inspections) * 0.3:
+            doc.add_paragraph('Объект требует проведения ремонтных работ.')
+        else:
+            doc.add_paragraph('Объект соответствует требованиям промышленной безопасности.')
+            
+        doc.add_heading('5. Рекомендации', level=1)
+        doc.add_paragraph('1. Продолжить плановый мониторинг состояния')
+        doc.add_paragraph('2. Устранить выявленные дефекты в установленные сроки')
+        doc.add_paragraph('3. Провести повторную диагностику через 12 месяцев')
     
-    # Summary
-    doc.add_paragraph()
-    doc.add_heading('Статистика', level=1)
-    
-    pending = sum(1 for w in repair_works if w.status and w.status.value == 'pending')
-    in_progress = sum(1 for w in repair_works if w.status and w.status.value == 'in_progress')
-    completed = sum(1 for w in repair_works if w.status and w.status.value == 'completed')
-    
-    doc.add_paragraph(f'Ожидают: {pending}')
-    doc.add_paragraph(f'В работе: {in_progress}')
-    doc.add_paragraph(f'Завершено: {completed}')
-    
-    # Save to temp file
+    # Save document
     temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.docx')
     doc.save(temp_file.name)
     temp_file.close()
     
-    filename = f'report_{report_type}_{datetime.now().strftime("%Y%m%d_%H%M%S")}.docx'
+    report_names = {
+        'questionnaire': 'oprosny_list',
+        'express': 'express_report', 
+        'final': 'final_report',
+        'csv': 'ffp_data',
+        'ndt': 'ddk_report',
+        'epb': 'epb_conclusion'
+    }
+    
+    filename = f'{report_names.get(report_type, "report")}_{now.strftime("%Y%m%d_%H%M%S")}.docx'
     
     return FileResponse(
         temp_file.name,
         filename=filename,
         media_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
     )
+
 
 
 @router.get("/generate")
