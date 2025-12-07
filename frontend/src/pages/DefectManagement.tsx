@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import {
     AlertTriangle, Camera, Wrench, CheckCircle,
-    Plus, X, Upload, Calendar, XCircle, SortAsc, SortDesc, Clock, List, FileDown, Trash2
+    Plus, X, Upload, Calendar, XCircle, SortAsc, SortDesc, Clock, List, FileDown, Trash2, Video
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -41,6 +41,7 @@ interface Media {
     is_before: boolean;
     description: string | null;
     uploaded_at: string;
+    media_type: 'photo' | 'video';
 }
 
 type TabType = 'defects' | 'works';
@@ -604,7 +605,7 @@ export default function DefectManagement() {
                                         <div>
                                             <h4 className="text-sm font-medium text-gray-700 mb-2">До ремонта</h4>
                                             <div className="grid grid-cols-2 gap-2">
-                                                {media.filter(m => m.is_before).map((m) => (
+                                                {media.filter(m => m.is_before && m.media_type === 'photo').map((m) => (
                                                     <div key={m.id} className="relative group">
                                                         <img
                                                             src={`${API_URL}/api/media/file/${m.id}`}
@@ -655,7 +656,7 @@ export default function DefectManagement() {
                                                 )}
                                             </h4>
                                             <div className="grid grid-cols-2 gap-2">
-                                                {media.filter(m => !m.is_before).map((m) => (
+                                                {media.filter(m => !m.is_before && m.media_type === 'photo').map((m) => (
                                                     <div key={m.id} className="relative group">
                                                         <img
                                                             src={`${API_URL}/api/media/file/${m.id}`}
@@ -682,6 +683,105 @@ export default function DefectManagement() {
                                                         <input
                                                             type="file"
                                                             accept="image/*"
+                                                            className="hidden"
+                                                            onChange={(e) => handleUploadPhoto(e, false)}
+                                                            disabled={uploading}
+                                                        />
+                                                        {uploading ? (
+                                                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-green-600"></div>
+                                                        ) : (
+                                                            <div className="text-center">
+                                                                <Upload className="w-6 h-6 text-gray-400 mx-auto" />
+                                                                <span className="text-xs text-gray-500">Загрузить</span>
+                                                            </div>
+                                                        )}
+                                                    </label>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Video Upload */}
+                                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mt-6">
+                                    <h3 className="font-semibold text-gray-900 mb-4 flex items-center">
+                                        <Video className="w-5 h-5 mr-2" />
+                                        Видеофиксация
+                                    </h3>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {/* Before videos */}
+                                        <div>
+                                            <h4 className="text-sm font-medium text-gray-700 mb-2">До ремонта</h4>
+                                            <div className="grid grid-cols-2 gap-2">
+                                                {media.filter(m => m.is_before && m.media_type === 'video').map((m) => (
+                                                    <div key={m.id} className="relative group">
+                                                        <video
+                                                            src={`${API_URL}/api/media/file/${m.id}`}
+                                                            className="w-full h-24 object-cover rounded-lg border border-gray-200"
+                                                            controls
+                                                        />
+                                                        {canEdit && (
+                                                            <button
+                                                                onClick={() => handleDeletePhoto(m.id)}
+                                                                className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 z-10"
+                                                                title="Удалить видео"
+                                                            >
+                                                                <X className="w-3 h-3" />
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                ))}
+                                                {canEdit && (
+                                                    <label className="flex items-center justify-center h-24 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-colors">
+                                                        <input
+                                                            type="file"
+                                                            accept="video/mp4,video/webm"
+                                                            className="hidden"
+                                                            onChange={(e) => handleUploadPhoto(e, true)}
+                                                            disabled={uploading}
+                                                        />
+                                                        {uploading ? (
+                                                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                                                        ) : (
+                                                            <div className="text-center">
+                                                                <Upload className="w-6 h-6 text-gray-400 mx-auto" />
+                                                                <span className="text-xs text-gray-500">Загрузить</span>
+                                                            </div>
+                                                        )}
+                                                    </label>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* After videos */}
+                                        <div>
+                                            <h4 className="text-sm font-medium text-gray-700 mb-2">После ремонта</h4>
+                                            <div className="grid grid-cols-2 gap-2">
+                                                {media.filter(m => !m.is_before && m.media_type === 'video').map((m) => (
+                                                    <div key={m.id} className="relative group">
+                                                        <video
+                                                            src={`${API_URL}/api/media/file/${m.id}`}
+                                                            className="w-full h-24 object-cover rounded-lg border-2 border-green-500"
+                                                            controls
+                                                        />
+                                                        <CheckCircle className="absolute top-1 left-1 w-4 h-4 text-green-600 z-10" />
+                                                        {canEdit && (
+                                                            <button
+                                                                onClick={() => handleDeletePhoto(m.id)}
+                                                                className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 z-10"
+                                                                title="Удалить видео"
+                                                            >
+                                                                <X className="w-3 h-3" />
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                ))}
+                                                {canEdit && (
+                                                    <label className="flex items-center justify-center h-24 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-green-500 hover:bg-green-50 transition-colors">
+                                                        <input
+                                                            type="file"
+                                                            accept="video/mp4,video/webm"
                                                             className="hidden"
                                                             onChange={(e) => handleUploadPhoto(e, false)}
                                                             disabled={uploading}
@@ -1040,7 +1140,7 @@ export default function DefectManagement() {
                                     <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                                         <h5 className="font-medium text-red-800 mb-3">До ремонта (нажмите для увеличения)</h5>
                                         <div className="grid grid-cols-2 gap-2">
-                                            {workMedia.filter(m => m.is_before).map((m) => (
+                                            {workMedia.filter(m => m.is_before && m.media_type === 'photo').map((m) => (
                                                 <img
                                                     key={m.id}
                                                     src={`${API_URL}/api/media/file/${m.id}`}
@@ -1059,7 +1159,7 @@ export default function DefectManagement() {
                                     <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                                         <h5 className="font-medium text-green-800 mb-3">После ремонта (нажмите для увеличения)</h5>
                                         <div className="grid grid-cols-2 gap-2">
-                                            {workMedia.filter(m => !m.is_before).map((m) => (
+                                            {workMedia.filter(m => !m.is_before && m.media_type === 'photo').map((m) => (
                                                 <img
                                                     key={m.id}
                                                     src={`${API_URL}/api/media/file/${m.id}`}
@@ -1078,7 +1178,43 @@ export default function DefectManagement() {
                                 {/* Video Section */}
                                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
                                     <h5 className="font-medium text-blue-800 mb-3">Видеофиксация</h5>
-                                    <p className="text-sm text-blue-600 italic">Видео не загружены. Функция загрузки видео будет добавлена.</p>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        {/* Before Videos */}
+                                        <div>
+                                            <h6 className="text-sm font-semibold text-blue-700 mb-2">До ремонта</h6>
+                                            <div className="grid grid-cols-2 gap-2">
+                                                {workMedia.filter(m => m.is_before && m.media_type === 'video').map((m) => (
+                                                    <video
+                                                        key={m.id}
+                                                        src={`${API_URL}/api/media/file/${m.id}`}
+                                                        className="w-full h-32 object-cover rounded-lg border-2 border-blue-300"
+                                                        controls
+                                                    />
+                                                ))}
+                                                {workMedia.filter(m => m.is_before && m.media_type === 'video').length === 0 && (
+                                                    <p className="col-span-2 text-sm text-blue-600 italic">Видео не загружены</p>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* After Videos */}
+                                        <div>
+                                            <h6 className="text-sm font-semibold text-blue-700 mb-2">После ремонта</h6>
+                                            <div className="grid grid-cols-2 gap-2">
+                                                {workMedia.filter(m => !m.is_before && m.media_type === 'video').map((m) => (
+                                                    <video
+                                                        key={m.id}
+                                                        src={`${API_URL}/api/media/file/${m.id}`}
+                                                        className="w-full h-32 object-cover rounded-lg border-2 border-blue-300"
+                                                        controls
+                                                    />
+                                                ))}
+                                                {workMedia.filter(m => !m.is_before && m.media_type === 'video').length === 0 && (
+                                                    <p className="col-span-2 text-sm text-blue-600 italic">Видео не загружены</p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
