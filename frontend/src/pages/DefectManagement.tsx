@@ -1080,16 +1080,41 @@ export default function DefectManagement() {
                         {/* Modal Footer */}
                         <div className="p-6 border-t border-gray-200 bg-gray-50">
                             <div className="flex items-center justify-between">
-                                {/* Download PDF Button */}
-                                <button
-                                    onClick={() => {
-                                        window.open(`${API_URL}/api/reports/defect/${selectedWork.id}/pdf`, '_blank');
-                                    }}
-                                    className="flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
-                                >
-                                    <FileDown className="w-4 h-4 mr-2" />
-                                    Скачать PDF отчёт
-                                </button>
+                                {/* Report Download Section */}
+                                <div className="flex items-center space-x-2">
+                                    <button
+                                        onClick={() => {
+                                            window.open(`${API_URL}/api/reports/defect/${selectedWork.id}/pdf`, '_blank');
+                                        }}
+                                        className="flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+                                    >
+                                        <FileDown className="w-4 h-4 mr-2" />
+                                        PDF отчёт
+                                    </button>
+                                    <select
+                                        id="reportTypeSelect"
+                                        className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+                                        defaultValue="express"
+                                    >
+                                        <option value="questionnaire">Опросный лист</option>
+                                        <option value="express">Экспресс-отчёт</option>
+                                        <option value="final">Заключительный</option>
+                                        <option value="csv">CSV/FFP</option>
+                                        <option value="ndt">ДДК-отчёт</option>
+                                        <option value="epb">Заключение ЭПБ</option>
+                                    </select>
+                                    <button
+                                        onClick={() => {
+                                            const select = document.getElementById('reportTypeSelect') as HTMLSelectElement;
+                                            const reportType = select?.value || 'express';
+                                            window.open(`${API_URL}/api/reports/filled/${reportType}`, '_blank');
+                                        }}
+                                        className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                                    >
+                                        <FileDown className="w-4 h-4 mr-2" />
+                                        DOCX
+                                    </button>
+                                </div>
 
                                 {/* Approval Buttons (Admin Only) */}
                                 {isAdmin && selectedWork.status === 'pending_approval' ? (

@@ -1,18 +1,9 @@
 import { useState } from 'react';
-import { FileText, Download, Calendar, ClipboardList, Zap, FileCheck, Database, Shield, Award } from 'lucide-react';
+import { FileText, Download, Calendar } from 'lucide-react';
 import { reportsAPI } from '../services/api';
 
-const REPORT_TYPES = [
-    { id: 'questionnaire', name: 'Опросный лист', icon: ClipboardList, color: 'bg-purple-500', description: 'Характеристики трубопровода и ТЗ на диагностику' },
-    { id: 'express', name: 'Экспресс-отчёт', icon: Zap, color: 'bg-orange-500', description: 'Оперативный отчёт с предварительными данными' },
-    { id: 'final', name: 'Заключительный отчёт', icon: FileCheck, color: 'bg-blue-500', description: 'Полная документация по результатам диагностики' },
-    { id: 'csv', name: 'CSV/FFP отчёт', icon: Database, color: 'bg-green-500', description: 'Выгрузка данных для интеграции' },
-    { id: 'ndt', name: 'ДДК-отчёт', icon: Shield, color: 'bg-red-500', description: 'Верификация дефектов методами НК' },
-    { id: 'epb', name: 'Заключение ЭПБ', icon: Award, color: 'bg-indigo-500', description: 'Экспертиза промышленной безопасности' },
-];
-
 export default function Reports() {
-    const [reportType, setReportType] = useState('final');
+
     const [format, setFormat] = useState<'html' | 'pdf'>('html');
     const [dateFrom, setDateFrom] = useState('');
     const [dateTo, setDateTo] = useState('');
@@ -62,30 +53,11 @@ export default function Reports() {
 
     return (
         <div className="max-w-6xl">
-            {/* Report Type Selection */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">Тип отчёта</h2>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {REPORT_TYPES.map((type) => {
-                        const Icon = type.icon;
-                        return (
-                            <button
-                                key={type.id}
-                                onClick={() => setReportType(type.id)}
-                                className={`p-4 rounded-xl border-2 text-left transition-all ${reportType === type.id
-                                    ? 'border-blue-500 bg-blue-50 shadow-md'
-                                    : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
-                                    }`}
-                            >
-                                <div className={`w-10 h-10 ${type.color} rounded-lg flex items-center justify-center mb-3`}>
-                                    <Icon className="w-5 h-5 text-white" />
-                                </div>
-                                <h3 className="font-semibold text-gray-900 text-sm">{type.name}</h3>
-                                <p className="text-xs text-gray-500 mt-1">{type.description}</p>
-                            </button>
-                        );
-                    })}
-                </div>
+            {/* Info Note */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                <p className="text-sm text-blue-800">
+                    Для генерации отчётов по конкретным работам перейдите в раздел <strong>Дефекты → Запланированные работы</strong> и выберите нужную работу.
+                </p>
             </div>
 
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -183,28 +155,8 @@ export default function Reports() {
                         </div>
                     </div>
 
-                    {/* Template Download & Generate Buttons */}
-                    <div className="pt-4 flex flex-col gap-3">
-                        <div className="flex gap-4">
-                            <a
-                                href={`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/reports/template/${reportType}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex-1 flex items-center justify-center px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium text-base"
-                            >
-                                <Download className="h-5 w-5 mr-2" />
-                                Скачать шаблон
-                            </a>
-                            <a
-                                href={`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/reports/filled/${reportType}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex-1 flex items-center justify-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium text-base"
-                            >
-                                <FileText className="h-5 w-5 mr-2" />
-                                Отчет с данными
-                            </a>
-                        </div>
+                    {/* Generate Button */}
+                    <div className="pt-4">
                         <button
                             onClick={handleGenerate}
                             disabled={generating}
