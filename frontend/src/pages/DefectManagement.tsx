@@ -969,7 +969,7 @@ export default function DefectManagement() {
             {/* Work Details Modal */}
             {selectedWork && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+                    <div className="bg-white rounded-xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto">
                         {/* Modal Header */}
                         <div className="p-6 border-b border-gray-200 flex items-start justify-between">
                             <div>
@@ -1038,7 +1038,7 @@ export default function DefectManagement() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     {/* Before Photos */}
                                     <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                                        <h5 className="font-medium text-red-800 mb-3">📷 До ремонта (нажмите для увеличения)</h5>
+                                        <h5 className="font-medium text-red-800 mb-3">До ремонта (нажмите для увеличения)</h5>
                                         <div className="grid grid-cols-2 gap-2">
                                             {workMedia.filter(m => m.is_before).map((m) => (
                                                 <img
@@ -1057,7 +1057,7 @@ export default function DefectManagement() {
 
                                     {/* After Photos */}
                                     <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                                        <h5 className="font-medium text-green-800 mb-3">📷 После ремонта (нажмите для увеличения)</h5>
+                                        <h5 className="font-medium text-green-800 mb-3">После ремонта (нажмите для увеличения)</h5>
                                         <div className="grid grid-cols-2 gap-2">
                                             {workMedia.filter(m => !m.is_before).map((m) => (
                                                 <img
@@ -1074,47 +1074,83 @@ export default function DefectManagement() {
                                         </div>
                                     </div>
                                 </div>
+
+                                {/* Video Section */}
+                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
+                                    <h5 className="font-medium text-blue-800 mb-3">Видеофиксация</h5>
+                                    <p className="text-sm text-blue-600 italic">Видео не загружены. Функция загрузки видео будет добавлена.</p>
+                                </div>
                             </div>
                         </div>
 
-                        {/* Modal Footer */}
+                        {/* Modal Footer with Report Types */}
                         <div className="p-6 border-t border-gray-200 bg-gray-50">
-                            <div className="flex items-center justify-between">
-                                {/* Report Download Section */}
-                                <div className="flex items-center space-x-2">
+                            <div className="mb-4">
+                                <h4 className="text-sm font-semibold text-gray-700 mb-3">Скачать отчёт</h4>
+                                <div className="grid grid-cols-3 md:grid-cols-7 gap-2">
+                                    {/* PDF Button */}
                                     <button
                                         onClick={() => {
                                             window.open(`${API_URL}/api/reports/defect/${selectedWork.id}/pdf`, '_blank');
                                         }}
-                                        className="flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+                                        className="flex flex-col items-center p-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-all"
+                                        title="Акт выполненных работ с фотографиями"
                                     >
-                                        <FileDown className="w-4 h-4 mr-2" />
-                                        PDF отчёт
+                                        <FileDown className="w-5 h-5 mb-1" />
+                                        <span className="text-xs">Акт PDF</span>
                                     </button>
-                                    <select
-                                        id="reportTypeSelect"
-                                        className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
-                                        defaultValue="express"
-                                    >
-                                        <option value="questionnaire">Опросный лист</option>
-                                        <option value="express">Экспресс-отчёт</option>
-                                        <option value="final">Заключительный</option>
-                                        <option value="csv">CSV/FFP</option>
-                                        <option value="ndt">ДДК-отчёт</option>
-                                        <option value="epb">Заключение ЭПБ</option>
-                                    </select>
+                                    {/* Report Types Grid */}
                                     <button
-                                        onClick={() => {
-                                            const select = document.getElementById('reportTypeSelect') as HTMLSelectElement;
-                                            const reportType = select?.value || 'express';
-                                            window.open(`${API_URL}/api/reports/filled/${reportType}`, '_blank');
-                                        }}
-                                        className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                                        onClick={() => window.open(`${API_URL}/api/reports/filled/questionnaire`, '_blank')}
+                                        className="flex flex-col items-center p-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-all"
+                                        title="Опросный лист - характеристики трубопровода и ТЗ"
                                     >
-                                        <FileDown className="w-4 h-4 mr-2" />
-                                        DOCX
+                                        <List className="w-5 h-5 mb-1" />
+                                        <span className="text-xs">Опросный</span>
+                                    </button>
+                                    <button
+                                        onClick={() => window.open(`${API_URL}/api/reports/filled/express`, '_blank')}
+                                        className="flex flex-col items-center p-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-all"
+                                        title="Экспресс-отчёт - оперативная сводка по обследованиям"
+                                    >
+                                        <Clock className="w-5 h-5 mb-1" />
+                                        <span className="text-xs">Экспресс</span>
+                                    </button>
+                                    <button
+                                        onClick={() => window.open(`${API_URL}/api/reports/filled/final`, '_blank')}
+                                        className="flex flex-col items-center p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all"
+                                        title="Заключительный отчёт - полная документация по диагностике"
+                                    >
+                                        <FileDown className="w-5 h-5 mb-1" />
+                                        <span className="text-xs">Финальный</span>
+                                    </button>
+                                    <button
+                                        onClick={() => window.open(`${API_URL}/api/reports/filled/csv`, '_blank')}
+                                        className="flex flex-col items-center p-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-all"
+                                        title="FFP отчёт - выгрузка данных для интеграции"
+                                    >
+                                        <FileDown className="w-5 h-5 mb-1" />
+                                        <span className="text-xs">FFP</span>
+                                    </button>
+                                    <button
+                                        onClick={() => window.open(`${API_URL}/api/reports/filled/ndt`, '_blank')}
+                                        className="flex flex-col items-center p-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all"
+                                        title="ДДК-отчёт - верификация дефектов методами НК"
+                                    >
+                                        <FileDown className="w-5 h-5 mb-1" />
+                                        <span className="text-xs">ДДК</span>
+                                    </button>
+                                    <button
+                                        onClick={() => window.open(`${API_URL}/api/reports/filled/epb`, '_blank')}
+                                        className="flex flex-col items-center p-3 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-all"
+                                        title="Заключение ЭПБ - экспертиза промышленной безопасности"
+                                    >
+                                        <FileDown className="w-5 h-5 mb-1" />
+                                        <span className="text-xs">ЭПБ</span>
                                     </button>
                                 </div>
+                            </div>
+                            <div className="flex items-center justify-end">
 
                                 {/* Approval Buttons (Admin Only) */}
                                 {isAdmin && selectedWork.status === 'pending_approval' ? (

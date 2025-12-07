@@ -265,7 +265,10 @@ async def generate_filled_report(
     return FileResponse(
         temp_file.name,
         filename=filename,
-        media_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        media_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        headers={
+            'Content-Disposition': f'attachment; filename="{filename}"'
+        }
     )
 
 
