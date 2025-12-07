@@ -184,16 +184,27 @@ export default function Reports() {
                     </div>
 
                     {/* Template Download & Generate Buttons */}
-                    <div className="pt-4 flex gap-4">
-                        <a
-                            href={`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/reports/template/${reportType}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex-1 flex items-center justify-center px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium text-base"
-                        >
-                            <Download className="h-5 w-5 mr-2" />
-                            Скачать шаблон
-                        </a>
+                    <div className="pt-4 flex flex-col gap-3">
+                        <div className="flex gap-4">
+                            <a
+                                href={`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/reports/template/${reportType}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex-1 flex items-center justify-center px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium text-base"
+                            >
+                                <Download className="h-5 w-5 mr-2" />
+                                Скачать шаблон
+                            </a>
+                            <a
+                                href={`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/reports/filled/${reportType}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex-1 flex items-center justify-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium text-base"
+                            >
+                                <FileText className="h-5 w-5 mr-2" />
+                                Отчет с данными
+                            </a>
+                        </div>
                         <button
                             onClick={handleGenerate}
                             disabled={generating}

@@ -67,6 +67,86 @@ async def download_template(report_type: str):
     
     return FileResponse(template_path, filename=filename)
 
+
+@router.get("/filled/{report_type}")
+async def generate_filled_report(
+    report_type: str,
+    db: Session = Depends(get_db)
+):
+    """Generate report filled with actual data from database"""
+    from docx import Document
+    from docx.shared import Pt
+    import tempfile
+    from datetime import datetime
+    
+    if report_type not in TEMPLATE_FILES:
+        raise HTTPException(status_code=404, detail="Report type not found")
+    
+    # Get repair works data
+    repair_works = db.query(models.RepairWork).order_by(models.RepairWork.created_at.desc()).limit(50).all()
+    
+    # Create new document
+    doc = Document()
+    
+    # Title
+    title = doc.add_heading('IntegrityOS - Отчет по работам', 0)
+    
+    # Info section
+    doc.add_paragraph(f'Дата формирования: {datetime.now().strftime("%d.%m.%Y %H:%M")}')
+    doc.add_paragraph(f'Тип отчета: {report_type}')
+    doc.add_paragraph(f'Количество записей: {len(repair_works)}')
+    doc.add_paragraph()
+    
+    # Table with works
+    if repair_works:
+        table = doc.add_table(rows=1, cols=5)
+        table.style = 'Table Grid'
+        
+        # Header row
+        header = table.rows[0].cells
+        header[0].text = 'ID'
+        header[1].text = 'Описание'
+        header[2].text = 'Статус'
+        header[3].text = 'Приоритет'
+        header[4].text = 'Дата'
+        
+        # Data rows
+        for work in repair_works:
+            row = table.add_row().cells
+            row[0].text = str(work.id)
+            row[1].text = work.description or 'Нет описания'
+            row[2].text = work.status.value if work.status else 'N/A'
+            row[3].text = work.priority.value if work.priority else 'N/A'
+            row[4].text = work.created_at.strftime('%d.%m.%Y') if work.created_at else 'N/A'
+    else:
+        doc.add_paragraph('Нет данных о работах')
+    
+    # Summary
+    doc.add_paragraph()
+    doc.add_heading('Статистика', level=1)
+    
+    pending = sum(1 for w in repair_works if w.status and w.status.value == 'pending')
+    in_progress = sum(1 for w in repair_works if w.status and w.status.value == 'in_progress')
+    completed = sum(1 for w in repair_works if w.status and w.status.value == 'completed')
+    
+    doc.add_paragraph(f'Ожидают: {pending}')
+    doc.add_paragraph(f'В работе: {in_progress}')
+    doc.add_paragraph(f'Завершено: {completed}')
+    
+    # Save to temp file
+    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.docx')
+    doc.save(temp_file.name)
+    temp_file.close()
+    
+    filename = f'report_{report_type}_{datetime.now().strftime("%Y%m%d_%H%M%S")}.docx'
+    
+    return FileResponse(
+        temp_file.name,
+        filename=filename,
+        media_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    )
+
+
 @router.get("/generate")
 async def generate_report(
     format: str = Query("html", regex="^(html|pdf)$"),
